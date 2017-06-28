@@ -13,7 +13,7 @@ namespace xwcs.indesign
     {
         private static string _pattern = @"^(?:#include\s+""([^""]+)"")$";
         private MatchEvaluator _evaluator;
-        private static HashSet<string> _doneFiles = new HashSet<string>();
+        private HashSet<string> _doneFiles = new HashSet<string>();
         private string _currentWorkDir;
 
         public JsComposer()

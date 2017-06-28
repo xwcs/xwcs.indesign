@@ -6,7 +6,7 @@ var LoggerFactory = (function (ind) {
 
     var ret = {
         getLogger : function(path){
-            return __openLogger(path);
+            return __openLogger(Folder.temp + '/' + path);
         }
     };
 

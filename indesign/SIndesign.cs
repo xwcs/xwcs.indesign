@@ -346,7 +346,6 @@ namespace xwcs.indesign
 
                 // load script
                 JsComposer jc = new JsComposer();
-
                 // here we need also 3 options for to have paths
                 _app.DoScript(
                     jc.Compose("id.js", core.manager.SPersistenceManager.getInstance().GetDefaultAssetsPath(typeof(JsComposer), core.manager.SPersistenceManager.AssetKind.Any) + "\\js\\bridge"),

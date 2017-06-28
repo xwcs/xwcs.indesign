@@ -1,7 +1,7 @@
 ﻿#target "indesign"
 #targetengine "session_CsBridge"
 var arguments = [
-    '%TEMP%/indesign.log',
+    'indesign.log',
     (function () {
         var f;
         try{ f=_indesign.activeScript; }

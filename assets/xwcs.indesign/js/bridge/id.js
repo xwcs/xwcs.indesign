@@ -40,8 +40,12 @@
             alert(f.parent + '/');
             return f.parent + '/';
             */
-
-            return CsBridge.options().scriptPath;
+            if(CsBridge == undefined){
+                alert("Failed CsBridge load!");
+                return '';
+            }else{
+                return CsBridge.options().scriptPath;
+            }
         })();
  
     // (Re)set the actions
