@@ -172,8 +172,8 @@ namespace xwcs.indesign
         //singleton need private ctor
         private SIndesign()
         {
-            InDesignLogPath = getCfgParam("Indesign/LogFile", "");
-            InDesignScriptsPath = getCfgParam("Indesign/ScriptDir", "");
+            InDesignLogPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/LogFile", ""));
+            InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/ScriptDir", ""));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -343,12 +343,18 @@ namespace xwcs.indesign
                                 new object[] { }) ?? "");
             if (ver != "0.0.2")
             {
+
                 // load script
-                string scr = File.ReadAllText("C:\\Projekty\\Egaf\\app.main\\xwcs.indesign\\JS\\id.js");
+                JsComposer jc = new JsComposer();
+
+                // here we need also 3 options for to have paths
                 _app.DoScript(
-                    scr,
+                    jc.Compose("id.js", core.manager.SPersistenceManager.getInstance().GetDefaultAssetsPath(typeof(JsComposer), core.manager.SPersistenceManager.AssetKind.Any) + "\\js\\bridge"),
                     global::InDesign.idScriptLanguage.idJavascript,
-                    new object[] { }
+                    new object[] {
+                        InDesignLogPath,
+                        InDesignScriptsPath
+                    }
                 );
             }
 
@@ -356,14 +362,10 @@ namespace xwcs.indesign
             // connect to c# server
             if ((bool)(ExecScriptInternal(_app, @"
                         CsBridge.open({
-                                url:arguments[0],
-                                log : arguments[1],
-                                scriptPath : arguments[2],
+                                url:arguments[0]
                         });
                 ", new object[] {
-                    _server.Url,
-                    InDesignLogPath,
-                    InDesignScriptsPath
+                    _server.Url
                 }) ?? false))
             {
                 _PingCounter = 100;

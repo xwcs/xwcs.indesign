@@ -7,7 +7,7 @@
     <ProjectGuid>{0F33E15D-8717-4B2E-A20C-93E8896F5B57}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>xwcs.indesign</RootNamespace>
+    <RootNamespace>xwcs</RootNamespace>
     <AssemblyName>xwcs.indesign</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -55,22 +55,49 @@
   <ItemGroup>
     <Compile Include="indesign\AsyncSocketServer.cs" />
     <Compile Include="indesign\DispatchUtility.cs" />
+    <Compile Include="indesign\JsComposer.cs" />
     <Compile Include="indesign\JsData.cs" />
     <Compile Include="indesign\JsEventBindable.cs" />
     <Compile Include="indesign\SIndesign.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="JS\file.open.rtf.jsx" />
-    <Content Include="JS\file.save.rtf.jsx" />
-    <Content Include="JS\file.save.rtf.new.doc.jsx" />
-    <Content Include="JS\id - Copy.js" />
-    <Content Include="JS\id.js" />
+    <Content Include="assets\xwcs.indesign\js\bridge\bridge.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\bridge\fileman.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\bridge\id_standalone.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\bridge\json2_min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\bridge\logger.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\file.open.rtf.jsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\file.save.rtf.jsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\xwcs.indesign\js\bridge\id.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="JS\MakeLinks.bat" />
-    <None Include="JS\template.indt" />
+    <None Include="assets\xwcs.indesign\js\MakeLinks.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\xwcs.indesign\js\template.indt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="xwcs.indesign.nuspec" />
   </ItemGroup>
