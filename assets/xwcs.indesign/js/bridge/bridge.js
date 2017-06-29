@@ -4,7 +4,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    var _CsBridge_version = '0.0.2';
+    const _CsBridge_version = '1.0.7';
 
     // private closure
     var _indesign = ind;
@@ -29,69 +29,6 @@ var CsBridge = (function (ind, opt) {
     */
     var _handlers = new Object();
 
-
-    // public interface
-    var ret = {
-        version : function(){
-            return _CsBridge_version;
-        },
-        open : function(options){
-            try{
-                __merge_options (options);
-
-                __log("Connecting ...");     
-
-                return __connect (_opt.url);
-            }catch(e){
-                __log(e.message);
-            }
-            
-        },
-        
-        addEventHandler : function(evtSource, evtKind){
-            // first check event listener presence
-            // we look for label   :   CsBridge + evtSource.Id + evtKind
-            var label = 'CsBridge_' + evtSource.id + '-' + evtKind;
-            if(_listenersMap.hasOwnProperty(label)){
-                // we have old listener already
-                // so just return
-                __log("Skipped add handler : " + label );
-                return ;
-            }
-            var listener = evtSource.addEventListener(evtKind, function(evt){
-                __eventHandler(evtKind, evt);    
-            });
-            _listenersMap[label] = listener.id;
-            __log("Added handler : " + label );
-        },
-
-        close : function(){
-            _tube.close();
-        },    
-
-        ping : function(){
-            __log("Sending ping ...");
-            var ret = __sendMessage('JsPing', {});
-            if(ret.status == 'ok'){
-                __log("Ping OK!");
-                return true;
-            }
-            __log("Ping FAIL!");
-            return false;
-        },
-
-        runAsync : function(what){
-            // we need send counter value from here cause inside it will use closure
-            return __registerTask({
-                taskId : _asyncTaskCounter++,
-                task: what
-            });
-        },
-
-        options: function () {
-            return _opt;
-        }
-    };
 
     var __eventHandler = function(eventKind, evt){
         __log("Event: " + eventKind);
@@ -169,8 +106,8 @@ var CsBridge = (function (ind, opt) {
 
     var __connect = function(url){
         if(__connected()) {
-            __log("Already connected check ping ...");
-            return true;
+            __log("Connected ... reopen ...");
+            _tube.close();
         }
         _tube = new Socket;
         if (_tube.open(url)) {
@@ -193,7 +130,7 @@ var CsBridge = (function (ind, opt) {
         if(_logger == null){
             _logger = LoggerFactory.getLogger(_opt.log);
         }
-        _logger.log(msg);
+        _logger.log("CsBridge : " + msg);
     };
 
 
@@ -234,11 +171,65 @@ var CsBridge = (function (ind, opt) {
         __log("Async task handler ... Returned ..." + JSON.stringify(ret));
     };
     
+    // some message
+    __log("CsBridge Started (" + _CsBridge_version + ")");
 
-    __log("CsBridge Started");
+    // return public interface
+    return {
+        version : function(){
+            return _CsBridge_version;
+        },
+        open : function(options){
+            try{
+                __merge_options (options);
 
+                __log("Connecting ...");     
 
-    return ret;
+                return __connect (_opt.url);
+            }catch(e){
+                __log(e.message);
+            }            
+        },        
+        addEventHandler : function(evtSource, evtKind){
+            // first check event listener presence
+            // we look for label   :   CsBridge + evtSource.Id + evtKind
+            var label = 'CsBridge_' + evtSource.id + '-' + evtKind;
+            if(_listenersMap.hasOwnProperty(label)){
+                // we have old listener already
+                // so just return
+                __log("Skipped add handler : " + label );
+                return ;
+            }
+            var listener = evtSource.addEventListener(evtKind, function(evt){
+                __eventHandler(evtKind, evt);    
+            });
+            _listenersMap[label] = listener.id;
+            __log("Added handler : " + label );
+        },
+        close : function(){
+            _tube.close();
+        },
+        ping : function(){
+            __log("Sending ping ...");
+            var ret = __sendMessage('JsPing', {});
+            if(ret.status == 'ok'){
+                __log("Ping OK!");
+                return true;
+            }
+            __log("Ping FAIL!");
+            return false;
+        },
+        runAsync : function(what){
+            // we need send counter value from here cause inside it will use closure
+            return __registerTask({
+                taskId : _asyncTaskCounter++,
+                task: what
+            });
+        },
+        options: function () {
+            return _opt;
+        }
+    };
 })(
     app,
     // options overwrite

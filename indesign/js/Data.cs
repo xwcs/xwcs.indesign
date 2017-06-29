@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xwcs.indesign
+namespace xwcs.indesign.js
 {
     namespace json
     {

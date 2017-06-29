@@ -1,7 +1,4 @@
-#target "indesign"
-#targetengine "session_CsBridge"
-
-/*
+﻿/*
     json2.js
     2011-10-19
 
@@ -163,6 +160,11 @@
 // methods in a closure to avoid creating global variables.
 
 var JSON;
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      return this.substr(position || 0, searchString.length) === searchString;
+  };
+}
 if (!JSON) {
     JSON = {};
 }

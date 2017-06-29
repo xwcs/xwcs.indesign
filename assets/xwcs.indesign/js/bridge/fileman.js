@@ -2,40 +2,27 @@
     File Manger
 */
 var FileManager = (function(ind){
-    var _indesign = ind;
 
     const TEMPLATE_FILE_NAME = 'template.indt',
           SCRIPT_NAME = 'Apri RTF';
-    var err = 0,
-        errMsg = '',
-        myStory,
-        convertPageBreaks,
-        convertTablesTo,
-        importEndnotes,
-        importFootnotes,
-        importIndex,
-        importTOC,
-        importUnusedStyles,
-        preserveGraphics,
-        preserveLocalOverrides,
-        preserveTrackChanges,
-        removeFormatting,
-        resolveParagraphStyleClash,
-        resolveCharacterStyleClash,
-        useTypographersQuotes,
-        indtPath = getScriptPath() + '/'+ TEMPLATE_FILE_NAME;
+
+    // indesign
+    var _indesign = ind;
+
+    var _err = 0,
+        _errMsg = '',
+        _myStory,
+        _prefsBackup,
+        _indtPath = __getScriptPath() + '/'+ TEMPLATE_FILE_NAME;
 
     var ret = {
-        open : function(path){
+        open : function(path, iterId){
 
             var fPath = path || "";
-            // Ask user to open the RTF
-            if(_indesign.wordRTFImportPreferences.useTypographersQuotes = true){ 
-                _indesign.wordRTFImportPreferences.useTypographersQuotes = false 
-            }else{ 
-                _indesign.wordRTFImportPreferences.useTypographersQuotes = true 
-            } 
 
+            // Ask user to open the RTF
+            _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
+            
             var rtfFile = null;
 
             if( !(rtfFile = File(fPath)).exists )
@@ -43,72 +30,66 @@ var FileManager = (function(ind){
                 rtfFile = File.openDialog('Apri RTF','Rich Text Format:*.*',false); 
             }
             
+            // block user
             _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+
             if(rtfFile){
-                try{
-                    init(indtPath);
+                try {
+                    // load template
+                    __init(_indtPath);
                     
-                    if (myStory){
+                    if (_myStory){
 		
                         //$.writeln(rtfFile.fsName);
 			
-                        setAppPreferences();
+                        __setAppPreferences();
 			
                         // place the RTF
-                        myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
+                        _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
 			
                         // save the RTF path into story label
-                        myStory.label = rtfFile.fsName;
-			
-                        //restoreAppPreferences();
+                        _myStory.label = iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        _indesign.activeDocument.label = iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        //__restoreAppPreferences();
                         
                     }else{
-                        err = -43;
-                        errMsg = 'Il template \r"'+indtPath+'"\r non esiste o non ha frame nella prima pagina.';
+                        _err = -43;
+                        _errMsg = 'Il template \r"'+_indtPath+'"\r non esiste o non ha frame nella prima pagina.';
                     }
                 }catch(e){
-                    err = e.number;
-                    errMsg = e.description;
+                    _err = e.number;
+                    _errMsg = e.description;
                 }finally{
-                    if(errMsg != '')alert (errMsg, SCRIPT_NAME);
+                    if(_errMsg != '') alert (_errMsg, SCRIPT_NAME);
                 }
             }
 
+            // give back user intercation
             _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
         }
     }
 
-    function init(indtPath){
+    function __init(path){
         var myDocument,
             myPage,
             myTextFrame,
-            indtFile = new File(indtPath);
+            indtFile = new File(path);
         if(indtFile.exists){
             myDocument = _indesign.open(indtFile);
             myPage = myDocument.pages.item(0);
             if(myPage.textFrames.length>0){
                 myTextFrame = myPage.textFrames.item(0);
-                myStory = myTextFrame.parentStory;
+
+                // set story
+                _myStory = myTextFrame.parentStory;
             }
         }
     }
 
-    function setAppPreferences(){
+    function __setAppPreferences(){
         // save current settings
-        convertPageBreaks = _indesign.wordRTFImportPreferences.convertPageBreaks;
-        convertTablesTo = _indesign.wordRTFImportPreferences.convertTablesTo;
-        importEndnotes = _indesign.wordRTFImportPreferences.importEndnotes;
-        importFootnotes = _indesign.wordRTFImportPreferences.importFootnotes;
-        importIndex = _indesign.wordRTFImportPreferences.importIndex;
-        importTOC = _indesign.wordRTFImportPreferences.importTOC;
-        importUnusedStyles = _indesign.wordRTFImportPreferences.importUnusedStyles;
-        preserveGraphics = _indesign.wordRTFImportPreferences.preserveGraphics;
-        preserveLocalOverrides = _indesign.wordRTFImportPreferences.preserveLocalOverrides;
-        preserveTrackChanges = _indesign.wordRTFImportPreferences.preserveTrackChanges;
-        removeFormatting = _indesign.wordRTFImportPreferences.removeFormatting;
-        resolveParagraphStyleClash = _indesign.wordRTFImportPreferences.resolveParagraphStyleClash;
-        resolveCharacterStyleClash = _indesign.wordRTFImportPreferences.resolveCharacterStyleClash;
-        useTypographersQuotes = _indesign.wordRTFImportPreferences.useTypographersQuotes;
+        _prefsBackup = _indesign.wordRTFImportPreferences.properties;
+
         // set predefined settings for the script
         _indesign.wordRTFImportPreferences.convertPageBreaks = ConvertPageBreaks.NONE;
         _indesign.wordRTFImportPreferences.convertTablesTo = ConvertTablesOptions.UNFORMATTED_TABBED_TEXT;
@@ -126,28 +107,15 @@ var FileManager = (function(ind){
         _indesign.wordRTFImportPreferences.useTypographersQuotes = true;
     }
 
-    function restoreAppPreferences(){
-        _indesign.wordRTFImportPreferences.convertPageBreaks = convertPageBreaks;
-        _indesign.wordRTFImportPreferences.convertTablesTo = convertTablesTo;
-        _indesign.wordRTFImportPreferences.importEndnotes = importEndnotes;
-        _indesign.wordRTFImportPreferences.importFootnotes = importFootnotes;
-        _indesign.wordRTFImportPreferences.importIndex = importIndex;
-        _indesign.wordRTFImportPreferences.importTOC = importTOC;
-        _indesign.wordRTFImportPreferences.importUnusedStyles = importUnusedStyles;
-        _indesign.wordRTFImportPreferences.preserveGraphics = preserveGraphics;
-        _indesign.wordRTFImportPreferences.preserveLocalOverrides = preserveLocalOverrides;
-        _indesign.wordRTFImportPreferences.preserveTrackChanges = preserveTrackChanges;
-        _indesign.wordRTFImportPreferences.removeFormatting = removeFormatting;
-        _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = resolveParagraphStyleClash;
-        _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = resolveCharacterStyleClash;
-        _indesign.wordRTFImportPreferences.useTypographersQuotes = useTypographersQuotes;
+    function __restoreAppPreferences() {
+        _indesign.wordRTFImportPreferences.properties = _prefsBackup;
     }
 
-    function getScriptPath() {
+    function __getScriptPath() {
         return CsBridge.options().scriptPath;        
     }
 
-    function pathOnly (inString)  {
+    function __pathOnly (inString)  {
         var s = inString + "";
         var a = s.split ("/", 10000);
         if(a.length > 0) a.pop();
@@ -159,7 +127,7 @@ var FileManager = (function(ind){
         if(_logger == null){
             _logger = LoggerFactory.getLogger(CsBridge.options().log);
         }
-        _logger.log(msg);
+        _logger.log("Filemanager : " + msg);
     };
     
     return ret;

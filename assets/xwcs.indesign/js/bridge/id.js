@@ -1,9 +1,7 @@
 ﻿#target "indesign"
 #targetengine "session_CsBridge"
 
-#include "json2_min.js"
-
-#include "logger.js"
+#include "support.js"
 
 #include "bridge.js"
 

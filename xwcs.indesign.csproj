@@ -55,9 +55,10 @@
   <ItemGroup>
     <Compile Include="indesign\AsyncSocketServer.cs" />
     <Compile Include="indesign\DispatchUtility.cs" />
-    <Compile Include="indesign\JsComposer.cs" />
-    <Compile Include="indesign\JsData.cs" />
-    <Compile Include="indesign\JsEventBindable.cs" />
+    <Compile Include="indesign\js\Composer.cs" />
+    <Compile Include="indesign\js\Data.cs" />
+    <Compile Include="indesign\js\EventBindable.cs" />
+    <Compile Include="indesign\js\Object.cs" />
     <Compile Include="indesign\SIndesign.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -74,7 +75,7 @@
     <Content Include="assets\xwcs.indesign\js\bridge\json2_min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\logger.js">
+    <Content Include="assets\xwcs.indesign\js\bridge\support.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\xwcs.indesign\js\file.open.rtf.jsx">

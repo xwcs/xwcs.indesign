@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 using xwcs.core;
 using xwcs.core.evt;
 
-namespace xwcs.indesign
+namespace xwcs.indesign.js
 {
-    public class JsEventBindable
+    public class EventBindable
     {
         private Dictionary<string, WeakEventSource<OnMessageEventArgs>> _events = new Dictionary<string, WeakEventSource<OnMessageEventArgs>>();
 
         protected CmdQueue _commandsQueue = new CmdQueue();
 
         // JsEventBindable
-        public JsEventBindable(object target)
+        public EventBindable(object target)
         {
             Target = target;
             TargetId = (int)this["Id"];

@@ -9,6 +9,7 @@ using xwcs.core.evt;
 using System.IO;
 using xwcs.core;
 using System.Threading;
+using xwcs.indesign.js;
 
 namespace xwcs.indesign
 {
@@ -147,7 +148,7 @@ namespace xwcs.indesign
         private static readonly object _lock = new object();
 
         // map of JsEventBindables
-        private Dictionary<int, JsEventBindable> _bindables = new Dictionary<int, JsEventBindable>();
+        private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();
 
         // indesign
         private InDesign._Application _app = null;
@@ -165,6 +166,22 @@ namespace xwcs.indesign
 
         public string InDesignLogPath { get; private set; }
         public string InDesignScriptsPath { get; private set; }
+
+
+        // JS API
+        private static FileManager _FileManager = null;
+        public static FileManager FileManager
+        {
+            get
+            {
+                if(ReferenceEquals(null, _FileManager))
+                {
+                    _FileManager = new FileManager();
+                }
+                return _FileManager;
+            }
+        }
+
 
         #region singleton
         private static SIndesign instance;
@@ -188,6 +205,13 @@ namespace xwcs.indesign
 
         public static void Start()
         {
+            lock (_lock)
+            {
+                if (instance == null)
+                {
+                    instance = new SIndesign();
+                }
+            }
             instance.ResetApp();
         }
         #endregion
@@ -233,8 +257,8 @@ namespace xwcs.indesign
         }
 
         #region events
-        private WeakEventSource<EventArgs> _wes_AfterInit = null;
-        public event EventHandler<EventArgs> AfterInit
+        private static WeakEventSource<EventArgs> _wes_AfterInit = null;
+        public static event EventHandler<EventArgs> AfterInit
         {
             add
             {
@@ -250,8 +274,8 @@ namespace xwcs.indesign
             }
         }
 
-        private WeakEventSource<OnMessageEventArgs> _wes_OnJsAction = null;
-        public event EventHandler<OnMessageEventArgs> OnJsAction
+        private static WeakEventSource<OnMessageEventArgs> _wes_OnJsAction = null;
+        public static event EventHandler<OnMessageEventArgs> OnJsAction
         {
             add
             {
@@ -269,11 +293,11 @@ namespace xwcs.indesign
         #endregion
 
 
-        public static JsEventBindable GetJsBindable(object target)
+        public static EventBindable GetJsBindable(object target)
         {
-            JsEventBindable jeb = new JsEventBindable(target);
+            EventBindable jeb = new EventBindable(target);
             // check if we have it
-            JsEventBindable trg;
+            EventBindable trg;
             if (instance._bindables.TryGetValue(jeb.TargetId,  out trg))
             {
                 // found
@@ -341,14 +365,17 @@ namespace xwcs.indesign
                                     error = e.message;
                                 }",
                                 new object[] { }) ?? "");
-            if (ver != "0.0.2")
+            if (ver != "1.0.7")
             {
 
                 // load script
-                JsComposer jc = new JsComposer();
+                string scr = new Composer().Compose("id.js", core.manager.SPersistenceManager.getInstance().GetDefaultAssetsPath(typeof(SIndesign), core.manager.SPersistenceManager.AssetKind.Any) + "\\js\\bridge");
+#if DEBUG_TRACE_LOG_ON
+                _logger.Debug("Script: {0}", scr.Substring(0, 512));
+#endif
                 // here we need also 3 options for to have paths
                 _app.DoScript(
-                    jc.Compose("id.js", core.manager.SPersistenceManager.getInstance().GetDefaultAssetsPath(typeof(JsComposer), core.manager.SPersistenceManager.AssetKind.Any) + "\\js\\bridge"),
+                    scr,
                     global::InDesign.idScriptLanguage.idJavascript,
                     new object[] {
                         InDesignLogPath,
@@ -434,33 +461,33 @@ namespace xwcs.indesign
 
         private void _server_OnMessage(object sender, OnMessageEventArgs e)
         {
-            if(e.Message.data is json.JsAction)
+            if(e.Message.data is js.json.JsAction)
             {
                 // do action
                 _wes_OnJsAction?.Raise(this, e);
             }
-            else if (e.Message.data is json.JsTaskResult)
+            else if (e.Message.data is js.json.JsTaskResult)
             {
                 TaskResultHandler th;
-                if(_taskResults.TryGetValue((e.Message.data as json.JsTaskResult).taskId, out th))
+                if(_taskResults.TryGetValue((e.Message.data as js.json.JsTaskResult).taskId, out th))
                 {
-                    th.Result = (e.Message.data as json.JsTaskResult).status;
-                    _taskResults.Remove((e.Message.data as json.JsTaskResult).taskId);
+                    th.Result = (e.Message.data as js.json.JsTaskResult).status;
+                    _taskResults.Remove((e.Message.data as js.json.JsTaskResult).taskId);
                 }else
                 {
-                    throw new ApplicationException(string.Format("Missing task {0}", (e.Message.data as json.JsTaskResult).taskId));
+                    throw new ApplicationException(string.Format("Missing task {0}", (e.Message.data as js.json.JsTaskResult).taskId));
                 }
             }
-            else if(e.Message.data is json.JsEvent)
+            else if(e.Message.data is js.json.JsEvent)
             {
                 // find Target
-                JsEventBindable trg;
-                if(_bindables.TryGetValue((e.Message.data as json.JsEvent).currentTargetID, out trg))
+                EventBindable trg;
+                if(_bindables.TryGetValue((e.Message.data as js.json.JsEvent).currentTargetID, out trg))
                 {
-                    trg.RaiseEvent((e.Message.data as json.JsEvent).eventKind, e);
+                    trg.RaiseEvent((e.Message.data as js.json.JsEvent).eventKind, e);
                 }else
                 {
-                    throw new ApplicationException(string.Format("Missing event target with id = {0}", (e.Message.data as json.JsEvent).currentTargetID));
+                    throw new ApplicationException(string.Format("Missing event target with id = {0}", (e.Message.data as js.json.JsEvent).currentTargetID));
                 }
             }
         }

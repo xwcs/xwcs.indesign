@@ -7,9 +7,10 @@ mklink "%DEST%\template.indt" "%cd%\template.indt"
 
 rem debug
 
-mklink "%DEST%\logger.js" "%cd%\bridge\logger.js"
+mklink "%DEST%\support.js" "%cd%\bridge\support.js"
 mklink "%DEST%\bridge.js" "%cd%\bridge\bridge.js"
 mklink "%DEST%\fileman.js" "%cd%\bridge\fileman.js"
 mklink "%DEST%\json2_min.js" "%cd%\bridge\json2_min.js"
+mklink "%DEST%\json2_src.js" "%cd%\bridge\json2_src.js"
 mklink "%DEST%\id.js" "%cd%\bridge\id.js"
 mklink "%DEST%\egaf.js" "%cd%\bridge\id_standalone.js"

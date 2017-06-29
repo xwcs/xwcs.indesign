@@ -6,17 +6,17 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace xwcs.indesign
+namespace xwcs.indesign.js
 {
     [xwcs.core.cfg.attr.Config("MainAppConfig")]
-    public class JsComposer : core.cfg.Configurable
+    public class Composer : core.cfg.Configurable
     {
         private static string _pattern = @"^(?:#include\s+""([^""]+)"")$";
         private MatchEvaluator _evaluator;
         private HashSet<string> _doneFiles = new HashSet<string>();
         private string _currentWorkDir;
 
-        public JsComposer()
+        public Composer()
         {
             _evaluator = new MatchEvaluator(Includer);
         }

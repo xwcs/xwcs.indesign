@@ -13,12 +13,12 @@ namespace xwcs.indesign
 {
     public class OnMessageEventArgs : EventArgs
     {
-        public OnMessageEventArgs(json.Message m)
+        public OnMessageEventArgs(js.json.Message m)
         {
             Message = m;
             Result = null;
         }
-        public json.Message Message { get; private set; }
+        public js.json.Message Message { get; private set; }
         public object Result { get; set; }
     }
 
@@ -146,7 +146,7 @@ namespace xwcs.indesign
                     _logger.Debug("Received: {0}", data);
 #endif
 
-                        OnMessageEventArgs args = new OnMessageEventArgs(JsonConvert.DeserializeObject<xwcs.indesign.json.Message>(data));
+                        OnMessageEventArgs args = new OnMessageEventArgs(JsonConvert.DeserializeObject<xwcs.indesign.js.json.Message>(data));
 
                         _wes_OnMessage.Raise(this, args);
 
