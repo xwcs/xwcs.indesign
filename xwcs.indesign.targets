@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\bridge.js">
+      <Link>assets\xwcs.indesign\js\bridge\bridge.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\fileman.js">
+      <Link>assets\xwcs.indesign\js\bridge\fileman.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\id_standalone.js">
+      <Link>assets\xwcs.indesign\js\bridge\id_standalone.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\json2_min.js">
+      <Link>assets\xwcs.indesign\js\bridge\json2_min.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\support.js">
+      <Link>assets\xwcs.indesign\js\bridge\support.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.open.rtf.jsx">
+      <Link>assets\xwcs.indesign\js\file.open.rtf.jsx</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.save.rtf.jsx">
+      <Link>assets\xwcs.indesign\js\file.save.rtf.jsx</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
+      <Link>assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\id.js">
+      <Link>assets\xwcs.indesign\js\bridge\id.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\MakeLinks.bat">
+      <Link>assets\xwcs.indesign\js\MakeLinks.bat</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\template.indt">
+      <Link>assets\xwcs.indesign\js\template.indt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

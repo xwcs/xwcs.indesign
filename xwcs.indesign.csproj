@@ -32,6 +32,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Deploy|AnyCPU'">
+    <OutputPath>bin\Deploy\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -63,33 +72,33 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\xwcs.indesign\js\bridge\bridge.js">
+    <None Include="assets\xwcs.indesign\js\bridge\bridge.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\fileman.js">
+    </None>
+    <None Include="assets\xwcs.indesign\js\bridge\fileman.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\id_standalone.js">
+    </None>
+    <None Include="assets\xwcs.indesign\js\bridge\id_standalone.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\json2_min.js">
+    </None>
+    <None Include="assets\xwcs.indesign\js\bridge\json2_min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\support.js">
+    </None>
+    <None Include="assets\xwcs.indesign\js\bridge\support.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\file.open.rtf.jsx">
+    </None>
+    <None Include="assets\xwcs.indesign\js\file.open.rtf.jsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\file.save.rtf.jsx">
+    </None>
+    <None Include="assets\xwcs.indesign\js\file.save.rtf.jsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
+    </None>
+    <None Include="assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\xwcs.indesign\js\bridge\id.js">
+    </None>
+    <None Include="assets\xwcs.indesign\js\bridge\id.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -100,7 +109,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="xwcs.indesign.nuspec" />
+    <None Include="xwcs.indesign.licenseheader" />
+    <None Include="xwcs.indesign.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="InDesign">
@@ -114,12 +126,20 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="bin\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\xwcs.core\xwcs.core.csproj">
       <Project>{64dd06ea-e442-4101-99b5-351c6a160472}</Project>
       <Name>xwcs.core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>pushd $(ProjectDir)
+if $(ConfigurationName) == Deploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName)
+popds</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

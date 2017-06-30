@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>xwcs.indesign</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Ladislav Sopko</authors>
+    <!--owners>0ics srls</owners-->
+    <!--licenseUrl>...</licenseUrl>
+    <projectUrl>...</projectUrl>
+    <iconUrl>...</iconUrl-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Indesign Bridge</description>
+    <releaseNotes>First release</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>C# &lt;-&gt; Indesign bridge</tags>
+    <dependencies>
+      <dependency id="xwcs.core" version="(,1.0.9999]" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="assets\xwcs.indesign\js\bridge\bridge.js" target="Build\assets\xwcs.indesign\js\bridge\bridge.js" />
+    <file src="assets\xwcs.indesign\js\bridge\fileman.js" target="Build\assets\xwcs.indesign\js\bridge\fileman.js" />
+    <file src="assets\xwcs.indesign\js\bridge\id_standalone.js" target="Build\assets\xwcs.indesign\js\bridge\id_standalone.js" />
+    <file src="assets\xwcs.indesign\js\bridge\json2_min.js" target="Build\assets\xwcs.indesign\js\bridge\json2_min.js" />
+    <file src="assets\xwcs.indesign\js\bridge\support.js" target="Build\assets\xwcs.indesign\js\bridge\support.js" />
+    <file src="assets\xwcs.indesign\js\file.open.rtf.jsx" target="Build\assets\xwcs.indesign\js\file.open.rtf.jsx" />
+    <file src="assets\xwcs.indesign\js\file.save.rtf.jsx" target="Build\assets\xwcs.indesign\js\file.save.rtf.jsx" />
+    <file src="assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx" target="Build\assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx" />
+    <file src="assets\xwcs.indesign\js\bridge\id.js" target="Build\assets\xwcs.indesign\js\bridge\id.js" />
+    <file src="assets\xwcs.indesign\js\MakeLinks.bat" target="Build\assets\xwcs.indesign\js\MakeLinks.bat" />
+    <file src="assets\xwcs.indesign\js\template.indt" target="Build\assets\xwcs.indesign\js\template.indt" />
+    <file src="xwcs.indesign.targets" target="Build\xwcs.indesign.targets" />
+  </files>
+</package>

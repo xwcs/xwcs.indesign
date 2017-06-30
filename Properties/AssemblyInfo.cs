@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("xwcs.indesign")]
 [assembly: AssemblyDescription(@"Indesign bridge")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("0ics srls")]
 [assembly: AssemblyProduct("xwcs.indesign")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
