@@ -15,7 +15,7 @@
     <copyright>Copyright 2017</copyright>
     <tags>C# &lt;-&gt; Indesign bridge</tags>
     <dependencies>
-      <dependency id="xwcs.core" version="(,1.0.9999]" />
+      <dependency id="xwcs.core" version="(,0.0.9999]" />
     </dependencies>
   </metadata>
   <files>
