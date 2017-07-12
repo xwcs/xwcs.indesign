@@ -99,6 +99,7 @@
     <None Include="assets\xwcs.indesign\js\bridge\id.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="xwcs.indesign.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -142,7 +143,7 @@ popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties IncrementInformational="True" IncrementOnRebuild="True" IncrementOnBuild="False" IncrementAction="3" Versioning="1" StartAt="636346368000000000" />
+      <UserProperties StartAt="636346368000000000" Versioning="1" IncrementAction="3" IncrementOnBuild="False" IncrementOnRebuild="True" IncrementInformational="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
