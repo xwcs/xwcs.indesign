@@ -34,24 +34,18 @@
             { caption: "Salva RTF", fileName: "file.save.rtf.jsx", subName: "" },
             { caption: "Salva RTF nuovo documento", fileName: "file.save.rtf.new.doc.jsx", subName: "" },
 			{ separator: true, subName: "" },
-			{ caption: "Inserisci tag figure/categorie...", fileName: "edit.insert.tags.figcat.js", subName: "" }
+			{ caption: "Inserisci tag figure/categorie...", fileName: "edit.insert.tags.figcat.js", subName: "" },
+            { caption: "Laco", fileName: "laco.js", subName: "" }
         ],
         LO_END = LocationOptions.atEnd,
         INDESIGN_ROOT_MENU = _indesign.menus.item( '$ID/Main' ),
         FEATURE_LOCATION_PATH = (function()
         {
-            /*
-            var f;
-            try{ f=_indesign.activeScript; }
-            catch(_){ f=File(_.fileName); }
-            alert(f.parent + '/');
-            return f.parent + '/';
-            */
             if(CsBridge == undefined){
                 alert("Failed CsBridge load!");
                 return '';
             }else{
-                return CsBridge.options().scriptPath;
+                return CsBridge.options().scriptPath + '/';
             }
         })();
  
@@ -67,6 +61,7 @@
  
         if( (f=File(FEATURE_LOCATION_PATH + t.fileName)).exists )
         {
+            CsBridge.log('Adding menu ... : ' + FEATURE_LOCATION_PATH + t.fileName);
             // The script file exists => create the corresponding action
             // and directly attach the event listener to the file
             // (no need to use _indesign.doScript(...) here)
@@ -76,6 +71,7 @@
         }
         else
         {
+            CsBridge.log('Missing file for menu ... : ' + FEATURE_LOCATION_PATH + t.fileName);
             // The script file does not exist => remove that feature
             // ---
             FEATURES.splice(i,1);

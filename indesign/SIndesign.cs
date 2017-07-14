@@ -199,7 +199,7 @@ namespace xwcs.indesign
         private SIndesign()
         {
             InDesignLogPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/LogFile", ""));
-            InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/ScriptDir", ""));
+            InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/ScriptDir", "")).Replace('\\', '/');
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -374,7 +374,7 @@ namespace xwcs.indesign
                                     error = e.message;
                                 }",
                                 new object[] { }) ?? "");
-            if (ver != "1.0.7")
+            if (ver != "1.0.8")
             {
 
                 // load script
@@ -437,11 +437,6 @@ namespace xwcs.indesign
             {
                 throw new ApplicationException("Asyn exec problem!");
             }
-        }
-
-        private void Th_OnDone1(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void Th_OnDone(object sender, EventArgs e)
