@@ -156,6 +156,8 @@ namespace xwcs.indesign
 
         private static readonly object _lock = new object();
 
+        public const string Version = "2.0.0";
+
         // map of JsEventBindables
         private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();
 
@@ -341,6 +343,20 @@ namespace xwcs.indesign
             return instance.ExecScriptInternal(App, script, pms);
         }
 
+        public static string CheckBridgeVersion()
+        {
+            string ver = (string)(ExecScript(@"
+                                try {
+                                    ver = CsBridge.version();
+                                }catch(e){
+                                    error = e.message;
+                                }",
+                                new object[] { }) ?? "");
+            if (ver == Version) return ver;
+
+            throw new ApplicationException("Wrong Indesign JS Bridge version or Misiing!");
+        }
+
         /// <summary>
         /// Reset all data and reinit InDesign
         /// </summary>
@@ -374,11 +390,11 @@ namespace xwcs.indesign
                                     error = e.message;
                                 }",
                                 new object[] { }) ?? "");
-            if (ver != "1.0.8")
+            if (ver != Version)
             {
 
                 // load script
-                string scr = new Composer().Compose("id.js", core.manager.SPersistenceManager.getInstance().GetDefaultAssetsPath(typeof(SIndesign), core.manager.SPersistenceManager.AssetKind.Any) + "\\js\\bridge");
+                string scr = new Composer().Compose("id.js");
 #if DEBUG_TRACE_LOG_ON
                 _logger.Debug("Script: {0}", scr.Substring(0, 512));
 #endif

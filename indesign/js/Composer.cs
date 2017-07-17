@@ -18,7 +18,7 @@ namespace xwcs.indesign.js
 
         public Composer()
         {
-            _evaluator = new MatchEvaluator(Includer);
+            _evaluator = new MatchEvaluator(m => ComposeInternal(_currentWorkDir, m.Groups[1].Value)); // Includer);
         }
 
         /// <summary>
@@ -29,19 +29,42 @@ namespace xwcs.indesign.js
         /// <param name="fName"></param>
         /// <param name="path">if empty composer will take assets default path</param>
         /// <returns></returns>
-        public string Compose(string fName, string path = "")
+        public string Compose(string fName, string path = null)
         {
-            _currentWorkDir = path;
+            path = path == null ? core.manager.SPersistenceManager.GetDefaultAssetsPath(core.manager.SPersistenceManager.AssetKind.JavaScript) : path;
 
-            return ComposeInternal(fName);            
-        }        
+            //#if DEBUG
+            return ComposeInternal(path, fName);
+/* This give not valid script in Indesign ....
+#else
+            Microsoft.Ajax.Utilities.Minifier m = new Microsoft.Ajax.Utilities.Minifier();
+            return m.MinifyJavaScript(ComposeInternal(path, fName)); 
+#endif
+*/
+        }
 
-        private string ComposeInternal(string fName)
+        private string ComposeInternal(string path, string fName)
         {
+            // save current dir, so we can turn it back when we done this file
+            string oldCurrentDir = _currentWorkDir;
+
             try
             {
+                string fn = string.Format("{0}{1}{2}", path, Path.DirectorySeparatorChar, fName);
+
+                // check file not done
+                if (_doneFiles.Contains(fn))
+                {
+                    return "// Skipped Cycle: " + fn;
+                }
+                // new file
+                _doneFiles.Add(fn);
+
+                // set curent dir for current file includes, it will be its own path
+                _currentWorkDir = Path.GetDirectoryName(fn);
+                // process file
                 var lines = File
-                .ReadLines(string.Format("{0}\\{1}", _currentWorkDir, fName))
+                .ReadLines(fn)
                 .Select(l => Regex.Replace(l, _pattern, _evaluator));
                 return string.Join("\r\n", lines);
             }
@@ -52,22 +75,18 @@ namespace xwcs.indesign.js
     Error: {0}
 */
                 ", e.Message);
+            }
+            finally
+            {
+                _currentWorkDir = oldCurrentDir;
             }            
         }
 
+        /*
         public string Includer(Match match)
         {
-            string fName = match.Groups[1].Value;
-
-            if (_doneFiles.Contains(fName))
-            {
-                // we skip it, just comment include
-                return "//" + match.Value;
-            }else
-            {
-                _doneFiles.Add(fName);
-                return ComposeInternal(fName);
-            }
+            return ComposeInternal(_currentWorkDir, match.Groups[1].Value);
         }
+        */
     }
 }

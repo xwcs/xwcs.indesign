@@ -13,8 +13,7 @@
 */
 var FileManager = (function(ind){
 
-    const TEMPLATE_FILE_NAME = 'template.indt',
-          SCRIPT_NAME = 'Apri RTF';
+    const TEMPLATE_FILE_NAME = 'template.indt';
 
     // indesign
     var _indesign = ind;
@@ -23,11 +22,16 @@ var FileManager = (function(ind){
         _errMsg = '',
         _myStory,
         _prefsBackup,
-        _indtPath = __getScriptPath() + '/'+ TEMPLATE_FILE_NAME;
+        _indtPath = __getScriptPath() + '/tmpl/'+ TEMPLATE_FILE_NAME;
 
     var ret = {
+        openFromDisk : function(){
+            this.open(null, "UNDEFINED");
+        },
         open : function(path, iterId){
-
+            _errMsg = '';
+            _err = 0;
+        
             var fPath = path || "";
 
             // Ask user to open the RTF
@@ -46,7 +50,8 @@ var FileManager = (function(ind){
             if(rtfFile){
                 try {
                     // load template
-                    __init(_indtPath);
+
+                    __initOpen(_indtPath);
                     
                     if (_myStory){
 		
@@ -70,16 +75,78 @@ var FileManager = (function(ind){
                     _err = e.number;
                     _errMsg = e.description;
                 }finally{
-                    if(_errMsg != '') alert (_errMsg, SCRIPT_NAME);
+                    if(_errMsg != '') alert (_errMsg, "FileManager.open");
                 }
             }
 
             // give back user intercation
             _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+        },
+
+
+        saveToDisk: function () {
+            var rtfFile = File.saveDialog("Save Exported File As:", ".rtf");
+            this.save(rtfFile);
+        },
+
+        // path can be empty if empty it will take it from story
+        save: function (file) {
+             _errMsg = '';
+             _err = 0;        
+            
+             var rtfFile = file || null;
+
+            _indesign.activeDocument.stories.everyItem().leading = Leading.AUTO;
+            _indesign.activeDocument.stories.everyItem().autoLeading = 100;
+            
+            //#include "Egaf_PulisciRTF.jsx" 
+            try {
+                __ensureDir(Folder.temp + '/indd');
+                _indesign.activeDocument.save(new File(Folder.temp + '/indd/Temporary.indd'));
+
+                __initSave();
+                if (_myStory) {
+
+                    // what we do ? save in existing from story or new one?
+                    if (rtfFile == null) {
+                        // iterId|||fileName
+                        var tmp = _myStory.label.split('|||')
+                        var rtfPath = tmp[1];
+                        rtfFile = new File(rtfPath);
+
+                        // in this case file must exists
+                        if (rtfFile.exists) {
+                            var p = _indesign.pdfExportPresets.firstItem();
+                            _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
+                        } else {
+                            _err = -43;
+                            _errMsg = 'L\'etichetta del brano non contiene un percorso valido per il file RTF da salvare.';
+                        }
+                    } else {
+                        // just export
+                        _myStory.exportFile(ExportFormat.RTF, rtfFile);
+                    }                   
+
+                    // close file
+                    _indesign.documents.item(0).close(SaveOptions.no);
+                }else{
+                    _err = -43;
+                    _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
+                }
+            }catch(e){
+                _err = e.number;
+                _errMsg = e.description;
+            }finally{
+                if ( _errMsg  != '') alert('Si è verificato l\'errore n°' + _err + '.\r' + _errMsg, "FileManager.save");
+            }
         }
     }
 
-    function __init(path){
+    function __ensureDir(path){
+        new Folder(path).create();  
+    }
+
+    function __initOpen(path) {
         var myDocument,
             myPage,
             myTextFrame,
@@ -91,6 +158,19 @@ var FileManager = (function(ind){
                 myTextFrame = myPage.textFrames.item(0);
 
                 // set story
+                _myStory = myTextFrame.parentStory;
+            }
+        }
+    }
+    function __initSave() {
+        var myDocument,
+            myPage,
+            myTextFrame,
+            myDocument = _indesign.activeDocument;
+        if (myDocument) {
+            myPage = myDocument.pages.item(0);
+            if (myPage.textFrames.length > 0) {
+                myTextFrame = myPage.textFrames.item(0);
                 _myStory = myTextFrame.parentStory;
             }
         }

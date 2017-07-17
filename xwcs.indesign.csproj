@@ -42,6 +42,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AjaxMin.5.14.5506.26202\lib\net40\AjaxMin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CustomMarshalers" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -72,41 +76,32 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\xwcs.indesign\js\bridge\bridge.js">
+    <None Include="assets\js\xwcs.indesign\bridge\bridge.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\bridge\fileman.js">
+    <None Include="assets\js\xwcs.indesign\bridge\fileman.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\bridge\id_standalone.js">
+    <None Include="assets\js\id_standalone.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\bridge\json2_min.js">
+    <None Include="assets\js\xwcs.indesign\bridge\json2_min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\bridge\support.js">
+    <None Include="assets\js\xwcs.indesign\bridge\support.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\file.open.rtf.jsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="assets\xwcs.indesign\js\file.save.rtf.jsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="assets\xwcs.indesign\js\bridge\id.js">
+    <None Include="assets\js\id.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="xwcs.indesign.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="assets\xwcs.indesign\js\MakeLinks.bat">
+    <None Include="assets\js\MakeLinks.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="assets\xwcs.indesign\js\template.indt">
+    <None Include="assets\js\tmpl\template.indt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -136,14 +131,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\xwcs.indesign\js\laco.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="assets\js\xwcs.indesign\bridge\menu.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\js\xwcs.indesign\menu\About.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\js\xwcs.indesign\menu\Action.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>pushd $(ProjectDir)
-if $(ConfigurationName) == Deploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName)
+rem last param can be test it will not push ---
+if $(ConfigurationName) == Deploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName) -
+popd
+pushd "$(ProjectDir)\assets\js"
+MakeLinks.bat
 popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>

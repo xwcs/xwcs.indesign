@@ -1,48 +1,48 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\bridge.js">
-      <Link>assets\xwcs.indesign\js\bridge\bridge.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\bridge\bridge.js">
+      <Link>assets\js\xwcs.indesign\bridge\bridge.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\fileman.js">
-      <Link>assets\xwcs.indesign\js\bridge\fileman.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\bridge\fileman.js">
+      <Link>assets\js\xwcs.indesign\bridge\fileman.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\id_standalone.js">
-      <Link>assets\xwcs.indesign\js\bridge\id_standalone.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\id_standalone.js">
+      <Link>assets\js\id_standalone.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\json2_min.js">
-      <Link>assets\xwcs.indesign\js\bridge\json2_min.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\bridge\json2_min.js">
+      <Link>assets\js\xwcs.indesign\bridge\json2_min.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\support.js">
-      <Link>assets\xwcs.indesign\js\bridge\support.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\bridge\support.js">
+      <Link>assets\js\xwcs.indesign\bridge\support.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.open.rtf.jsx">
-      <Link>assets\xwcs.indesign\js\file.open.rtf.jsx</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\id.js">
+      <Link>assets\js\id.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.save.rtf.jsx">
-      <Link>assets\xwcs.indesign\js\file.save.rtf.jsx</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\MakeLinks.bat">
+      <Link>assets\js\MakeLinks.bat</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx">
-      <Link>assets\xwcs.indesign\js\file.save.rtf.new.doc.jsx</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\tmpl\template.indt">
+      <Link>assets\js\tmpl\template.indt</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\bridge\id.js">
-      <Link>assets\xwcs.indesign\js\bridge\id.js</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\bridge\menu.js">
+      <Link>assets\js\xwcs.indesign\bridge\menu.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\MakeLinks.bat">
-      <Link>assets\xwcs.indesign\js\MakeLinks.bat</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\menu\About.js">
+      <Link>assets\js\xwcs.indesign\menu\About.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)assets\xwcs.indesign\js\template.indt">
-      <Link>assets\xwcs.indesign\js\template.indt</Link>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\menu\Action.js">
+      <Link>assets\js\xwcs.indesign\menu\Action.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

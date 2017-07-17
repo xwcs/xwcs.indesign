@@ -14,7 +14,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    const _CsBridge_version = '1.0.8';
+    const _CsBridge_version = '2.0.0';
 
     // private closure
     var _indesign = ind;
@@ -253,8 +253,9 @@ var CsBridge = (function (ind, opt) {
             }
             __log("Action FAIL!");
             throw new error(ret.msg);
-        }
-
+        },
+        // public property
+        Indesign: function () { return _indesign; }
     };
 })(
     app,
