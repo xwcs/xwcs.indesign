@@ -141,6 +141,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\js\xwcs.indesign\menu\SaveRTF.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>pushd $(ProjectDir)
@@ -152,7 +157,7 @@ popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties StartAt="636346368000000000" Versioning="1" IncrementAction="3" IncrementOnBuild="False" IncrementOnRebuild="True" IncrementInformational="True" />
+      <UserProperties IncrementInformational="True" IncrementOnRebuild="True" IncrementOnBuild="False" IncrementAction="3" Versioning="1" StartAt="636346368000000000" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

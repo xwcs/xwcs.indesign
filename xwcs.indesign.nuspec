@@ -30,6 +30,7 @@
     <file src="assets\js\xwcs.indesign\bridge\menu.js" target="Build\assets\js\xwcs.indesign\bridge\menu.js" />
     <file src="assets\js\xwcs.indesign\menu\About.js" target="Build\assets\js\xwcs.indesign\menu\About.js" />
     <file src="assets\js\xwcs.indesign\menu\Action.js" target="Build\assets\js\xwcs.indesign\menu\Action.js" />
+    <file src="assets\js\xwcs.indesign\menu\SaveRTF.js" target="Build\assets\js\xwcs.indesign\menu\SaveRTF.js" />
     <file src="xwcs.indesign.targets" target="Build\xwcs.indesign.targets" />
   </files>
 </package>

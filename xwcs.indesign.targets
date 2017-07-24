@@ -45,5 +45,9 @@
       <Link>assets\js\xwcs.indesign\menu\Action.js</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)assets\js\xwcs.indesign\menu\SaveRTF.js">
+      <Link>assets\js\xwcs.indesign\menu\SaveRTF.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

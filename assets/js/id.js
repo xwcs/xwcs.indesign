@@ -29,6 +29,7 @@
         "C#",
         // features
         [
+            { caption: "Salva File", fileName: "xwcs.indesign/menu/SaveRTF.js", subName: "" },
             { caption: "Action", fileName: "xwcs.indesign/menu/Action.js", subName: "" },
             { separator: true, subName: "" },
             { caption: "Info", fileName: "xwcs.indesign/menu/About.js", subName: "" }			

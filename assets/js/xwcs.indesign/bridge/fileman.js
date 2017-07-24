@@ -90,6 +90,16 @@ var FileManager = (function(ind){
         },
 
         // path can be empty if empty it will take it from story
+        // it return object
+        /*
+            {
+                // save file handle object
+                file: SavedFile,
+                // saved file parsed meta
+                meta: array[]
+            }
+
+        */
         save: function (file) {
              _errMsg = '';
              _err = 0;        
@@ -107,10 +117,11 @@ var FileManager = (function(ind){
                 __initSave();
                 if (_myStory) {
 
+                    // iterId|||fileName
+                    var tmp = _myStory.label.split('|||')
+
                     // what we do ? save in existing from story or new one?
                     if (rtfFile == null) {
-                        // iterId|||fileName
-                        var tmp = _myStory.label.split('|||')
                         var rtfPath = tmp[1];
                         rtfFile = new File(rtfPath);
 
@@ -118,6 +129,7 @@ var FileManager = (function(ind){
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
+                            return { file: rtfFile, meta: tmp };
                         } else {
                             _err = -43;
                             _errMsg = 'L\'etichetta del brano non contiene un percorso valido per il file RTF da salvare.';
@@ -125,6 +137,7 @@ var FileManager = (function(ind){
                     } else {
                         // just export
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
+                        return { file: rtfFile, meta: tmp };
                     }                   
 
                     // close file

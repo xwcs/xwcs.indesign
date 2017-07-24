@@ -156,6 +156,20 @@ namespace xwcs.indesign
 
         private static readonly object _lock = new object();
 
+        private static int _activeUsers = 0;
+        public static void RegisterActiveUser(object u)
+        {
+            ++_activeUsers;
+        }
+        public static void UnregisterActiveUser(object u)
+        {
+            --_activeUsers;
+            if(_activeUsers == 0)
+            {
+                instance.Dispose();
+            }
+        }
+
         public const string Version = "2.0.0";
 
         // map of JsEventBindables
@@ -177,6 +191,7 @@ namespace xwcs.indesign
 
         public string InDesignLogPath { get; private set; }
         public string InDesignScriptsPath { get; private set; }
+        public string InDesignTempPath { get; private set; }
 
 
         // JS API
@@ -202,6 +217,7 @@ namespace xwcs.indesign
         {
             InDesignLogPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/LogFile", ""));
             InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/ScriptDir", "")).Replace('\\', '/');
+            InDesignTempPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/TempDir", "")).Replace('\\', '/');
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -269,6 +285,10 @@ namespace xwcs.indesign
 
         #region events
         private static WeakEventSource<EventArgs> _wes_AfterInit = null;
+        public static bool HasAfterInit(EventHandler<EventArgs> evth)
+        {
+            return _wes_AfterInit != null && _wes_AfterInit.HasHandler(evth);
+        }
         public static event EventHandler<EventArgs> AfterInit
         {
             add
@@ -286,6 +306,10 @@ namespace xwcs.indesign
         }
 
         private static WeakEventSource<OnMessageEventArgs> _wes_OnJsAction = null;
+        public static bool HasOnJsAction(EventHandler<OnMessageEventArgs> evth)
+        {
+            return _wes_OnJsAction != null && _wes_OnJsAction.HasHandler(evth);
+        }
         public static event EventHandler<OnMessageEventArgs> OnJsAction
         {
             add
