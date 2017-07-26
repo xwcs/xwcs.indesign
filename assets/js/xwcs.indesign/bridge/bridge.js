@@ -14,7 +14,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    const _CsBridge_version = '2.0.0';
+    const _CsBridge_version = '2.1.2';
 
     // private closure
     var _indesign = ind;
@@ -85,17 +85,29 @@ var CsBridge = (function (ind, opt) {
         }
     };
 
+    var __padNumber = function(num, size) {
+        var s = "000000000" + num;
+        return s.substr(s.length - size);
+    };
+
     var __sendMessage = function(kindStr, what){
         
         what.DataKindType = __getMessageKind(kindStr);
-
-        _tube.write(JSON.stringify({
+        var msg = JSON.stringify({
             id: 1,
             data: what
-        }));
+        });
+        // first send size 
+        _tube.write(__padNumber(msg.length, 10));
+
+        // then message
+        _tube.write(msg);
         
-        // parse
-        var result = _tube.read();
+        // parse input message
+        // it will first arrive 10 chars length
+        var len = parseInt(_tube.read(10), 10);
+        // now read len chars
+        var result = _tube.read(len);
         if(result == "") return {status: 'error', msg: 'empty resposne'};
         try{
             var d = JSON.parse(result);
@@ -120,8 +132,9 @@ var CsBridge = (function (ind, opt) {
             _tube.close();
         }
         _tube = new Socket;
-        if (_tube.open(url)) {
+        if (_tube.open(url, _opt.encoding)) {
             __log("Connected.");
+            _tube.timeout = _opt.timeout;
             return true;
         }
         // not good
@@ -190,7 +203,7 @@ var CsBridge = (function (ind, opt) {
             return _CsBridge_version;
         },
         open : function(options){
-            try{
+            try {
                 __merge_options (options);
 
                 __log("Connecting ...");     
@@ -263,6 +276,8 @@ var CsBridge = (function (ind, opt) {
     {
         url: '',
         log: arguments[0],
-        scriptPath: arguments[1]
+        scriptPath: arguments[1],
+        encoding: arguments[2] || "ASCII", // { "ASCII", "BINARY", or "UTF-8"}
+        timeout: arguments[3] || 10 // seconds
     }
 );

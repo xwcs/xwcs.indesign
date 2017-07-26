@@ -40,9 +40,9 @@ namespace xwcs.indesign.js
     {
         public FileManager() : base("FileManager") { }
 
-        public object open(string path, int iterId)
+        public object open(string path, object data)
         {
-            return Call(_(path, iterId));
+            return Call(_(path, data));
         }
     }
 

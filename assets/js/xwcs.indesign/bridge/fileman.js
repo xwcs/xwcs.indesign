@@ -28,11 +28,13 @@ var FileManager = (function(ind){
         openFromDisk : function(){
             this.open(null, "UNDEFINED");
         },
-        open : function(path, iterId){
+        open : function(path, data){
             _errMsg = '';
             _err = 0;
         
             var fPath = path || "";
+
+            __log(JSON.stringify(data));
 
             // Ask user to open the RTF
             _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
@@ -63,8 +65,9 @@ var FileManager = (function(ind){
                         _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
 			
                         // save the RTF path into story label
-                        _myStory.label = iterId + '|||' + rtfFile.fsName;  // iter ID and path
-                        _indesign.activeDocument.label = iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        data.RtfFilePath = rtfFile.fsName;
+                        _myStory.label = JSON.stringify(data); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        _indesign.activeDocument.label = JSON.stringify(data); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //__restoreAppPreferences();
                         
                     }else{
@@ -118,18 +121,19 @@ var FileManager = (function(ind){
                 if (_myStory) {
 
                     // iterId|||fileName
-                    var tmp = _myStory.label.split('|||')
+                    //var tmp = _myStory.label.split('|||')
+                    var data = JSON.parse(_myStory.label);
 
                     // what we do ? save in existing from story or new one?
                     if (rtfFile == null) {
-                        var rtfPath = tmp[1];
+                        var rtfPath = data.RtfFilePath; //tmp[1];
                         rtfFile = new File(rtfPath);
 
                         // in this case file must exists
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
-                            return { file: rtfFile, meta: tmp };
+                            return { file: rtfFile, meta: data };
                         } else {
                             _err = -43;
                             _errMsg = 'L\'etichetta del brano non contiene un percorso valido per il file RTF da salvare.';
@@ -137,7 +141,7 @@ var FileManager = (function(ind){
                     } else {
                         // just export
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
-                        return { file: rtfFile, meta: tmp };
+                        return { file: rtfFile, meta: data };
                     }                   
 
                     // close file

@@ -170,7 +170,7 @@ namespace xwcs.indesign
             }
         }
 
-        public const string Version = "2.0.0";
+        public const string Version = "2.1.2";
 
         // map of JsEventBindables
         private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();
@@ -192,6 +192,8 @@ namespace xwcs.indesign
         public string InDesignLogPath { get; private set; }
         public string InDesignScriptsPath { get; private set; }
         public string InDesignTempPath { get; private set; }
+        public string InDesignSocketEncoding { get; private set; }
+        public int InDesignSocketTimeout { get; private set; }
 
 
         // JS API
@@ -218,6 +220,8 @@ namespace xwcs.indesign
             InDesignLogPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/LogFile", ""));
             InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/ScriptDir", "")).Replace('\\', '/');
             InDesignTempPath = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/TempDir", "")).Replace('\\', '/');
+            InDesignSocketEncoding = xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/Socket/@encoding", "ASCII"));
+            InDesignSocketTimeout = int.Parse(xwcs.core.manager.SPersistenceManager.getInstance().TemplatizePath(getCfgParam("Indesign/Socket/@timeout", "10")));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -242,6 +246,40 @@ namespace xwcs.indesign
             instance.ResetApp();
         }
         #endregion
+
+        public static bool Started
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new SIndesign();
+                    }
+                }
+
+                if (ReferenceEquals(null, instance._app)) return false;
+
+                try
+                {
+                    // if indesign is down this go in exception
+                    return  instance._app.FullName != "";
+                }
+                catch (Exception e)
+                {
+                    if (e is System.Runtime.InteropServices.COMException && e.HResult == unchecked((int)0x800706ba))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        // not managed exception type , forward it
+                        throw;
+                    }
+                }
+            }
+        }
 
         public static _Application App
         {
@@ -378,7 +416,7 @@ namespace xwcs.indesign
                                 new object[] { }) ?? "");
             if (ver == Version) return ver;
 
-            throw new ApplicationException("Wrong Indesign JS Bridge version or Misiing!");
+            throw new ApplicationException("Wrong Indesign JS Bridge version or Mising!");
         }
 
         /// <summary>
@@ -428,7 +466,9 @@ namespace xwcs.indesign
                     global::InDesign.idScriptLanguage.idJavascript,
                     new object[] {
                         InDesignLogPath,
-                        InDesignScriptsPath
+                        InDesignScriptsPath,
+                        InDesignSocketEncoding,
+                        InDesignSocketTimeout
                     }
                 );
             }

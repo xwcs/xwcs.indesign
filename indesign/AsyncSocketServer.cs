@@ -136,8 +136,9 @@ namespace xwcs.indesign
             try
             {
                 NetworkStream networkStream = tcpClient.GetStream();
-                
+
                 // Buffer for reading data
+                byte[] lenB = new byte[11];
                 byte[] bytes = new byte[10000];
                 string data = null;
 
@@ -146,8 +147,40 @@ namespace xwcs.indesign
                 using(_cancelTokenSource.Token.Register(() => networkStream.Close()))
                 {
                     // Loop to receive all the data sent by the client.
-                    while ((i = await networkStream.ReadAsync(bytes, 0, bytes.Length, _cancelTokenSource.Token)) != 0)
+                    bool done = false;
+                    while (!done)
                     {
+                        if((i = await networkStream.ReadAsync(lenB, 0, 10, _cancelTokenSource.Token)) != 10)
+                        {
+                            if (i == 0)
+                            {
+                                done = true;
+                                continue;
+                            }
+                            else
+                            {
+                                throw new ApplicationException("Wrong data on socket!");
+                            }
+                        }
+                        // now read len bytes
+                        int len = int.Parse(Encoding.ASCII.GetString(lenB, 0, i));
+                        if(len > bytes.Length)
+                        {
+                            bytes = new byte[len];
+                        }
+                        // now read data
+                        if ((i = await networkStream.ReadAsync(bytes, 0, len, _cancelTokenSource.Token)) != len)
+                        {
+                            if(i == 0) {
+                                done = true;
+                                continue;
+                            }
+                            else
+                            {
+                                throw new ApplicationException("Wrong data on socket!");
+                            }                            
+                        }
+
                         // Translate data bytes to a ASCII string.
                         data = Encoding.ASCII.GetString(bytes, 0, i);
 
@@ -168,11 +201,14 @@ namespace xwcs.indesign
                         data = JsonConvert.SerializeObject(resp);
 
                         byte[] msg = Encoding.ASCII.GetBytes(data);
-
+                        // write data, first size padded 10 char stringed number
+                        string lstr = msg.Length.ToString("0000000000");
+                        byte[] lenbuf = Encoding.ASCII.GetBytes(lstr);
+                        await networkStream.WriteAsync(lenbuf, 0, 10);
                         // Send back a response.
                         await networkStream.WriteAsync(msg, 0, msg.Length);
 #if DEBUG_TRACE_LOG_ON
-                    _logger.Debug("Sent: {0}", data);
+                        _logger.Debug("Sent: [{0}] -> {1}", lstr, data);
 #endif
                     }
                     tcpClient.Close();
