@@ -14,9 +14,9 @@
     <releaseNotes>First release</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>C# &lt;-&gt; Indesign bridge</tags>
-    <dependencies>
+    <!--dependencies>
       <dependency id="xwcs.core" version="(,0.0.9999]" />
-    </dependencies>
+    </dependencies-->
   </metadata>
   <files>
     <file src="assets\js\xwcs.indesign\bridge\bridge.js" target="Build\assets\js\xwcs.indesign\bridge\bridge.js" />
