@@ -14,7 +14,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    const _CsBridge_version = '2.1.2';
+    const _CsBridge_version = '2.1.6';
 
     // private closure
     var _indesign = ind;
@@ -103,11 +103,14 @@ var CsBridge = (function (ind, opt) {
         // then message
         _tube.write(msg);
         
+        __log("About to read size");
         // parse input message
         // it will first arrive 10 chars length
         var len = parseInt(_tube.read(10), 10);
         // now read len chars
+        __log("About to read " + len + " chars");
         var result = _tube.read(len);
+        __log("Arrived : " + len + " chars")
         if(result == "") return {status: 'error', msg: 'empty resposne'};
         try{
             var d = JSON.parse(result);

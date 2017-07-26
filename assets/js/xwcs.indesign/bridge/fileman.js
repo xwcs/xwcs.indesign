@@ -28,14 +28,15 @@ var FileManager = (function(ind){
         openFromDisk : function(){
             this.open(null, "UNDEFINED");
         },
+        // data can be stringized json !!!
         open : function(path, data){
             _errMsg = '';
             _err = 0;
         
             var fPath = path || "";
 
-            __log(JSON.stringify(data));
-
+            __log("Custom data : " + data);
+            
             // Ask user to open the RTF
             _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
             
@@ -65,9 +66,13 @@ var FileManager = (function(ind){
                         _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
 			
                         // save the RTF path into story label
+                        var lData = {
+                            RtfFilePath: rtfFile.fsName,
+                            meta : typeof(data) == "string" ? JSON.parse(data) : data
+                        }
                         data.RtfFilePath = rtfFile.fsName;
-                        _myStory.label = JSON.stringify(data); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
-                        _indesign.activeDocument.label = JSON.stringify(data); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        _myStory.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        //_indesign.activeDocument.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //__restoreAppPreferences();
                         
                     }else{
@@ -87,9 +92,9 @@ var FileManager = (function(ind){
         },
 
 
-        saveToDisk: function () {
+        saveToDisk: function (doClose) {
             var rtfFile = File.saveDialog("Save Exported File As:", ".rtf");
-            this.save(rtfFile);
+            return this.save(rtfFile, doClose);
         },
 
         // path can be empty if empty it will take it from story
@@ -103,11 +108,14 @@ var FileManager = (function(ind){
             }
 
         */
-        save: function (file) {
+        save: function (file, doClose) {
              _errMsg = '';
-             _err = 0;        
+             _err = 0;
+             var ret = null;
             
              var rtfFile = file || null;
+             doClose = doClose != undefined ? doClose : false;
+
 
             _indesign.activeDocument.stories.everyItem().leading = Leading.AUTO;
             _indesign.activeDocument.stories.everyItem().autoLeading = 100;
@@ -133,7 +141,7 @@ var FileManager = (function(ind){
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
-                            return { file: rtfFile, meta: data };
+                            ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
                             _errMsg = 'L\'etichetta del brano non contiene un percorso valido per il file RTF da salvare.';
@@ -141,11 +149,11 @@ var FileManager = (function(ind){
                     } else {
                         // just export
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
-                        return { file: rtfFile, meta: data };
+                        ret = { file: rtfFile, meta: data.meta };
                     }                   
 
                     // close file
-                    _indesign.documents.item(0).close(SaveOptions.no);
+                    if(doClose) _indesign.documents.item(0).close(SaveOptions.no);
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
@@ -156,6 +164,8 @@ var FileManager = (function(ind){
             }finally{
                 if ( _errMsg  != '') alert('Si è verificato l\'errore n°' + _err + '.\r' + _errMsg, "FileManager.save");
             }
+
+            return ret;
         }
     }
 

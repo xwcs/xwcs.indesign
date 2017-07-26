@@ -42,7 +42,8 @@ namespace xwcs.indesign.js
 
         public object open(string path, object data)
         {
-            return Call(_(path, data));
+            // there is object data marshaling problem so serialize data in json
+            return Call(_(path, Newtonsoft.Json.JsonConvert.SerializeObject(data)));
         }
     }
 

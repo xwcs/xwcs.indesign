@@ -170,7 +170,7 @@ namespace xwcs.indesign
             }
         }
 
-        public const string Version = "2.1.2";
+        public const string Version = "2.1.6";
 
         // map of JsEventBindables
         private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();

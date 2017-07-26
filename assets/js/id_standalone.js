@@ -17,6 +17,8 @@ var arguments = [
         catch(_){ f=File(_.fileName); }
         //alert(f.parent + '/');
         return f.parent + '/';
-    })()
+    })(),
+    "ASCII",
+    10
 ];
 #include "id.js"

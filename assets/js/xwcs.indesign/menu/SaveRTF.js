@@ -14,10 +14,19 @@
 
     try{
         
-        var result = FileManager.save();
-        // call c# action
-        var ret = br.doAction({action:'SaveFile', data:{'FilePath': result.file.fullName, iterId: result.meta[0]}});
-        br.log("C# response: " + JSON.stringify(ret));
+        var result = FileManager.save(null, false); // save but not close
+        if(result != null){
+            // call c# action
+            var ret = br.doAction({
+                what:'SaveRtf', 
+                args:[
+                    result.file.fullName, 
+                    JSON.stringify(result.meta)
+                ]
+            });
+            br.log("C# response: " + JSON.stringify(ret));
+        }
+        
 
     }catch(e){
         alert(e);
