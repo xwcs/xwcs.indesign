@@ -288,3 +288,4 @@ __pycache__/
 *.xsd.cs
 
 assets/js/lib.indesign
+*.bak

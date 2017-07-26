@@ -41,6 +41,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TestDeploy|AnyCPU'">
+    <OutputPath>bin\TestDeploy\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
       <HintPath>..\packages\AjaxMin.5.14.5506.26202\lib\net40\AjaxMin.dll</HintPath>
@@ -150,6 +159,7 @@
   <PropertyGroup>
     <PostBuildEvent>pushd $(ProjectDir)
 if $(ConfigurationName) == Deploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName) -
+if $(ConfigurationName) == TestDeploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName) test
 popd
 pushd "$(ProjectDir)\assets\js"
 MakeLinks.bat
