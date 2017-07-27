@@ -20,7 +20,7 @@
             var ret = br.doAction({
                 what:'SaveRtf', 
                 args:[
-                    false, // not main
+                    true, // main
                     result.file.fullName, 
                     JSON.stringify(result.meta)
                 ]
@@ -29,7 +29,6 @@
             if(!ret.success){
                 alert("Operazione FALITA! " + ret.msg);
             }
-
             br.log("C# response: " + JSON.stringify(ret));
         }
         
