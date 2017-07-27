@@ -19,6 +19,6 @@ var arguments = [
         return f.parent + '/';
     })(),
     "ASCII",
-    10
+    300
 ];
 #include "id.js"

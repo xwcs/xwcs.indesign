@@ -19,6 +19,7 @@
     </dependencies-->
   </metadata>
   <files>
+    <file src="assets\js\tmpl\empty.rtf" target="Build\assets\js\tmpl\empty.rtf" />
     <file src="assets\js\xwcs.indesign\bridge\bridge.js" target="Build\assets\js\xwcs.indesign\bridge\bridge.js" />
     <file src="assets\js\xwcs.indesign\bridge\fileman.js" target="Build\assets\js\xwcs.indesign\bridge\fileman.js" />
     <file src="assets\js\id_standalone.js" target="Build\assets\js\id_standalone.js" />
@@ -31,6 +32,7 @@
     <file src="assets\js\xwcs.indesign\menu\About.js" target="Build\assets\js\xwcs.indesign\menu\About.js" />
     <file src="assets\js\xwcs.indesign\menu\Action.js" target="Build\assets\js\xwcs.indesign\menu\Action.js" />
     <file src="assets\js\xwcs.indesign\menu\SaveRTF.js" target="Build\assets\js\xwcs.indesign\menu\SaveRTF.js" />
+    <file src="assets\js\xwcs.indesign\menu\SaveMainRTF.js" target="Build\assets\js\xwcs.indesign\menu\SaveMainRTF.js" />
     <file src="xwcs.indesign.targets" target="Build\xwcs.indesign.targets" />
   </files>
 </package>

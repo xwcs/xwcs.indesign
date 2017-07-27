@@ -24,17 +24,19 @@
                     result.file.fullName, 
                     JSON.stringify(result.meta)
                 ]
-            });
+            }) || { success : false, msg: "Unhadled error" };
+
+            
 
             if(!ret.success){
-                alert("Operazione FALITA! " + ret.msg);
+                alert("Operazione FALITA!  [" + ret.msg + "]");
             }
             br.log("C# response: " + JSON.stringify(ret));
         }
         
 
     }catch(e){
-        alert(e);
+        alert("Menu Error: " + e);
     }    
 
 })(CsBridge);

@@ -200,13 +200,12 @@ namespace xwcs.indesign
                         }
                         data = JsonConvert.SerializeObject(resp);
 
-                        byte[] msg = Encoding.ASCII.GetBytes(data);
+                        IEnumerable<byte> msg = Encoding.ASCII.GetBytes(data);
                         // write data, first size padded 10 char stringed number
-                        string lstr = msg.Length.ToString("0000000000");
-                        byte[] lenbuf = Encoding.ASCII.GetBytes(lstr);
-                        await networkStream.WriteAsync(lenbuf, 0, 10);
-                        // Send back a response.
-                        await networkStream.WriteAsync(msg, 0, msg.Length);
+                        int msglen = msg.Count();
+                        string lstr = msglen.ToString("0000000000");
+                        await networkStream.WriteAsync(Encoding.ASCII.GetBytes(lstr).Concat(Encoding.ASCII.GetBytes(data)).ToArray(), 0, msglen + 10);
+                      
 #if DEBUG_TRACE_LOG_ON
                         _logger.Debug("Sent: [{0}] -> {1}", lstr, data);
 #endif

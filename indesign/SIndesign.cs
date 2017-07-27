@@ -170,7 +170,10 @@ namespace xwcs.indesign
             }
         }
 
-        public const string Version = "2.1.6";
+        /// <summary>
+        /// This must match version from bridge.js
+        /// </summary>
+        public const string Version = "2.1.11";
 
         // map of JsEventBindables
         private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();

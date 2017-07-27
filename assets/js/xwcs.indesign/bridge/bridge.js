@@ -14,7 +14,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    const _CsBridge_version = '2.1.6';
+    const _CsBridge_version = '2.1.11';
 
     // private closure
     var _indesign = ind;
@@ -29,6 +29,9 @@ var CsBridge = (function (ind, opt) {
     var _opt = opt;
 
     var _listenersMap = {};
+
+    // current url connection
+    var _currentUrl = "";
 
     /*
         map of elements
@@ -97,21 +100,37 @@ var CsBridge = (function (ind, opt) {
             id: 1,
             data: what
         });
-        // first send size 
-        _tube.write(__padNumber(msg.length, 10));
 
-        // then message
-        _tube.write(msg);
-        
+        var msgLen = __padNumber(msg.length, 10);
+        // send data
+        _tube.write(msgLen, msg);
+
         __log("About to read size");
         // parse input message
         // it will first arrive 10 chars length
-        var len = parseInt(_tube.read(10), 10);
+        var sizeStr = _tube.read(10);
+        if (sizeStr.length > 10) {
+            // wire error reset socket
+            __log("Read timeout ...");
+            __connect(_currentUrl);
+            return { status: 'error', msg: "Read timout" };
+        }
+        // parse len
+        var len = parseInt(sizeStr, 10);
+        if (isNaN(len)) {
+            __log("Read size problem ...");
+            __connect(_currentUrl);
+            return { status: 'error', msg: "Read timout" };
+        }
         // now read len chars
         __log("About to read " + len + " chars");
         var result = _tube.read(len);
+        if (result.length < len) {
+            __log("Read msg problem ...");
+            __connect(_currentUrl);
+            return { status: 'error', msg: "Read timout" };
+        }
         __log("Arrived : " + len + " chars")
-        if(result == "") return {status: 'error', msg: 'empty resposne'};
         try{
             var d = JSON.parse(result);
             if(d.hasOwnProperty("status")){
@@ -134,6 +153,7 @@ var CsBridge = (function (ind, opt) {
             __log("Connected ... reopen ...");
             _tube.close();
         }
+        _currentUrl = url;
         _tube = new Socket;
         if (_tube.open(url, _opt.encoding)) {
             __log("Connected.");
@@ -268,7 +288,7 @@ var CsBridge = (function (ind, opt) {
                 return ret.data;
             }
             __log("Action FAIL!");
-            throw new error(ret.msg);
+            throw ret.msg;
         },
         // public property
         Indesign: function () { return _indesign; }
@@ -281,6 +301,6 @@ var CsBridge = (function (ind, opt) {
         log: arguments[0],
         scriptPath: arguments[1],
         encoding: arguments[2] || "ASCII", // { "ASCII", "BINARY", or "UTF-8"}
-        timeout: arguments[3] || 10 // seconds
+        timeout: arguments[3] || 600 // seconds
     }
 );

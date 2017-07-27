@@ -122,9 +122,7 @@ var FileManager = (function(ind){
             
             //#include "Egaf_PulisciRTF.jsx" 
             try {
-                __ensureDir(Folder.temp + '/indd');
-                _indesign.activeDocument.save(new File(Folder.temp + '/indd/Temporary.indd'));
-
+                
                 __initSave();
                 if (_myStory) {
 
@@ -136,6 +134,11 @@ var FileManager = (function(ind){
                     if (rtfFile == null) {
                         var rtfPath = data.RtfFilePath; //tmp[1];
                         rtfFile = new File(rtfPath);
+
+                        // save indd
+                        __ensureDir(Folder.temp + '/indd');
+                        var inddName = rtfFile.name.replace(".rtf", ".indd");
+                        _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));                       
 
                         // in this case file must exists
                         if (rtfFile.exists) {
