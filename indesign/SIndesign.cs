@@ -173,7 +173,7 @@ namespace xwcs.indesign
         /// <summary>
         /// This must match version from bridge.js
         /// </summary>
-        public const string Version = "2.1.11";
+        public const string Version = "2.1.12";
 
         // map of JsEventBindables
         private Dictionary<int, EventBindable> _bindables = new Dictionary<int, EventBindable>();

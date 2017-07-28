@@ -14,7 +14,7 @@
 
 var CsBridge = (function (ind, opt) {
     // this will help mantain C# <-> IND compatibility
-    const _CsBridge_version = '2.1.11';
+    const _CsBridge_version = '2.1.12';
 
     // private closure
     var _indesign = ind;
