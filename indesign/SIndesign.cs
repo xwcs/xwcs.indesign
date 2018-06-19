@@ -81,7 +81,7 @@ namespace xwcs.indesign
             _wes_OnFail?.Raise(this, new EventArgs());
         }
 
-        // this will check value each 10 milisecs
+        // this will check value each 10 milliseconds
         public void Check()
         {
             _t = new Thread(new ThreadStart(watch));
@@ -185,7 +185,7 @@ namespace xwcs.indesign
         private AsyncSocketService _server = null;
 
         // some later execution
-        protected CmdQueue _commandsQueue = new CmdQueue();
+        protected CmdQueue _commandsQueue = new CmdQueue(SEventProxy.InvokeDelegate);
 
         // async task results
         // when wee call async indesign it will return task id
@@ -271,15 +271,19 @@ namespace xwcs.indesign
                 }
                 catch (Exception e)
                 {
-                    if (e is System.Runtime.InteropServices.COMException && e.HResult == unchecked((int)0x800706ba))
+                    if (e is System.Runtime.InteropServices.COMException)
                     {
-                        return false;
+                        if(
+                            e.HResult == unchecked((int)0x80010108) ||  // RPC disconnected
+                            e.HResult == unchecked((int)0x800706ba)     // RPC unavailable
+                        )
+                        {
+                            return false;
+                        }
                     }
-                    else
-                    {
-                        // not managed exception type , forward it
-                        throw;
-                    }
+
+                    // not managed exception type , forward it
+                    throw;
                 }
             }
         }
@@ -419,14 +423,18 @@ namespace xwcs.indesign
                                 new object[] { }) ?? "");
             if (ver == Version) return ver;
 
-            throw new ApplicationException("Wrong Indesign JS Bridge version or Mising!");
+            throw new ApplicationException("Wrong Indesign JS Bridge version or missing!");
         }
 
         /// <summary>
-        /// Reset all data and reinit InDesign
+        /// Reset all data and reinitialize InDesign
         /// </summary>
         private void ResetApp()
         {
+#if DEBUG_TRACE_LOG_ON
+            _logger.Debug("Reset indesign");
+#endif
+
             // reset server
             if (ReferenceEquals(_server, null))
             {
@@ -440,7 +448,7 @@ namespace xwcs.indesign
                 _server.RunAsync();
             }
 
-            // reset chached data
+            // reset cached data
             _bindables.Clear();
 
 
@@ -455,6 +463,7 @@ namespace xwcs.indesign
                                     error = e.message;
                                 }",
                                 new object[] { }) ?? "");
+
             if (ver != Version)
             {
 
@@ -486,6 +495,9 @@ namespace xwcs.indesign
                     _server.Url
                 }) ?? false))
             {
+#if DEBUG_TRACE_LOG_ON
+                _logger.Debug("Ping for later execution added");
+#endif
                 _PingCounter = 100;
                 _commandsQueue.ExecuteLater(DoPing);
             }else
@@ -498,7 +510,9 @@ namespace xwcs.indesign
         
         private void DoPing()
         {
+#if DEBUG_TRACE_LOG_ON
             _logger.Debug("Ping: {0}", _PingCounter);
+#endif
 
             int taskid = (int)(ExecScriptInternal(_app, "CsBridge.runAsync(CsBridge.ping);", new object[] { }) ?? -1);
             if(taskid >= 0)
@@ -509,7 +523,9 @@ namespace xwcs.indesign
                 th.OnDone += Th_OnDone; 
                 th.OnFail += Th_OnFail;
                 th.OnTimeout += (s, e) => {
+#if DEBUG_TRACE_LOG_ON
                     _logger.Debug("Task timeout!");
+#endif
                     // remove task
                     _taskResults.Remove(taskid);
                     throw new ApplicationException("Problem with InDesig ping!");
@@ -524,13 +540,17 @@ namespace xwcs.indesign
 
         private void Th_OnDone(object sender, EventArgs e)
         {
-            _logger.Debug("Task done!");
+#if DEBUG_TRACE_LOG_ON
+            _logger.Debug("Task done! -> raise after init");
+#endif
             _commandsQueue.ExecuteLater(RaiseAfterInit);
         }
 
         private void Th_OnFail(object sender, EventArgs e)
         {
+#if DEBUG_TRACE_LOG_ON
             _logger.Debug("Task fail!");
+#endif
             if(--_PingCounter > 0)
             {
                 _commandsQueue.ExecuteLater(DoPing);
@@ -543,6 +563,9 @@ namespace xwcs.indesign
 
         private void RaiseAfterInit()
         {
+#if DEBUG_TRACE_LOG_ON
+            _logger.Debug("Raise after init!");
+#endif
             _wes_AfterInit?.Raise(this, new EventArgs());
         }
 

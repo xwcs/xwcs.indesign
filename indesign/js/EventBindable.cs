@@ -13,11 +13,12 @@ namespace xwcs.indesign.js
     {
         private Dictionary<string, WeakEventSource<OnMessageEventArgs>> _events = new Dictionary<string, WeakEventSource<OnMessageEventArgs>>();
 
-        protected CmdQueue _commandsQueue = new CmdQueue();
+        protected CmdQueue _commandsQueue = null;
 
         // JsEventBindable
         public EventBindable(object target)
         {
+            _commandsQueue = new CmdQueue(SEventProxy.InvokeDelegate);
             Target = target;
             TargetId = (int)this["Id"];
         }
