@@ -223,8 +223,8 @@ namespace xwcs.indesign
             InDesignLogPath = xwcs.core.manager.SPersistenceManager.TemplatizePath(getCfgParam("Indesign/LogFile", ""));
             InDesignScriptsPath = xwcs.core.manager.SPersistenceManager.TemplatizePath(getCfgParam("Indesign/ScriptDir", "")).Replace('\\', '/');
             InDesignTempPath = xwcs.core.manager.SPersistenceManager.TemplatizePath(getCfgParam("Indesign/TempDir", "")).Replace('\\', '/');
-            InDesignSocketEncoding = xwcs.core.manager.SPersistenceManager.TemplatizePath(getCfgParam("Indesign/Socket/@encoding", "ASCII"));
-            InDesignSocketTimeout = int.Parse(xwcs.core.manager.SPersistenceManager.TemplatizePath(getCfgParam("Indesign/Socket/@timeout", "10")));
+            InDesignSocketEncoding = getCfgParam("Indesign/Socket/@encoding", "ASCII");
+            InDesignSocketTimeout = int.Parse(getCfgParam("Indesign/Socket/@timeout", "10"));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
