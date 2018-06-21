@@ -14,7 +14,7 @@
 
     try{
         
-        var result = FileManager.save(null, false); // save but not close
+        var result = FileManager.save(null, true); // save and close
         if(result != null){
             // call c# action
             var ret = br.doAction({

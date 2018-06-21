@@ -124,17 +124,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="InDesign">
-      <Guid>{531EBB2B-227C-4732-A979-00052EFF35D5}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="bin\" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +153,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="InDesign">
+      <Guid>{F4B43528-68EA-4C29-8A18-6FBD8E3C24C4}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>pushd $(ProjectDir)
@@ -171,7 +171,7 @@ if $(ConfigurationName) == Deploy $(SolutionDir)deploy\NugetJob.bat - - $(Config
 if $(ConfigurationName) == TestDeploy $(SolutionDir)deploy\NugetJob.bat - - $(ConfigurationName) test
 popd
 pushd "$(ProjectDir)\assets\js"
-MakeLinks.bat
+MakeLinks.bat 2&gt;null
 popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
