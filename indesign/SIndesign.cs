@@ -467,10 +467,11 @@ namespace xwcs.indesign
             if (ver != Version)
             {
 
-                // load script
-                string scr = new Composer().Compose("id.js");
+        // load script
+       string scr = new Composer().Compose("id.js");
+        //string scr = new Composer().Compose("id_standalone.js");
 #if DEBUG_TRACE_LOG_ON
-                _logger.Debug("Script: {0}", scr.Substring(0, 512));
+        _logger.Debug("Script: {0}", scr.Substring(0, 512));
 #endif
                 // here we need also 3 options for to have paths
                 _app.DoScript(
@@ -528,7 +529,7 @@ namespace xwcs.indesign
 #endif
                     // remove task
                     _taskResults.Remove(taskid);
-                    throw new ApplicationException("Problem with InDesig ping!");
+                    throw new ApplicationException("Problem with InDesign ping!");
                 };
                 th.Check(); // start internal thread
             }
