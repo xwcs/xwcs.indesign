@@ -18,11 +18,12 @@ var FileManager = (function(ind){
     // indesign
     var _indesign = ind;
 
-    var _err = 0,
-        _errMsg = '',
-        _myStory,
-        _prefsBackup,
-        _indtPath = __getScriptPath() + '/tmpl/'+ TEMPLATE_FILE_NAME;
+    var _err = 0;
+    var _errMsg = '';
+    var _myStory;
+    var _myLabel;
+    var  _prefsBackup;
+    var _indtPath = __getScriptPath() + '/tmpl/'+ TEMPLATE_FILE_NAME;
 
     var ret = {
         openFromDisk : function(){
@@ -35,7 +36,7 @@ var FileManager = (function(ind){
         
             var fPath = path || "";
 
-            __log("Custom data : " + data);
+            __log("Custom data: " + data);
             
             // Ask user to open the RTF
             _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
@@ -128,7 +129,7 @@ var FileManager = (function(ind){
 
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
-                    var data = JSON.parse(_myStory.label);
+                    var data = JSON.parse(_myLabel);
 
                     // what we do ? save in existing from story or new one?
                     if (rtfFile == null) {
@@ -177,10 +178,10 @@ var FileManager = (function(ind){
     }
 
     function __initOpen(path) {
-        var myDocument,
-            myPage,
-            myTextFrame,
-            indtFile = new File(path);
+        var myDocument;
+        var myPage;
+        var myTextFrame;
+        var indtFile = new File(path);
         if(indtFile.exists){
             myDocument = _indesign.open(indtFile);
             myPage = myDocument.pages.item(0);
@@ -193,17 +194,42 @@ var FileManager = (function(ind){
         }
     }
     function __initSave() {
-        var myDocument,
-            myPage,
-            myTextFrame,
-            myDocument = _indesign.activeDocument;
+        var myDocument;
+        var myPage;
+        var myTextFrame;
+        myDocument = _indesign.activeDocument;
         if (myDocument) {
+            //loop all stories to check if there is a label
+            var __stories = myDocument.stories.length;
+            var __foundLabel=0;
+            for (var i = 0; i < __stories;i++) {
+              var __label = myDocument.stories[i].label;
+              if ( __label) {
+                var __data = JSON.parse(__label);
+                if (__data.meta.id_iter) {
+                  //I take the first label because more than one label is not allowed
+                  _myLabel = __label;
+                  __foundLabel++;
+                  }
+                }
+              }
+            if (__foundLabel == 1) {
+              } else  if (__foundLabel == 0) {
+                    _errMsg = 'Non trovata la label che identifica il documento Iter.';
+              } else {
+                    _errMsg = 'Trovata più di una label che identifica il documento Iter.';
+                }
             myPage = myDocument.pages.item(0);
             if (myPage.textFrames.length > 0) {
                 myTextFrame = myPage.textFrames.item(0);
                 _myStory = myTextFrame.parentStory;
             }
-        }
+        } else {
+          _errMsg = 'Nessun documento aperto.';
+        }        
+        if ( _errMsg  != '') {
+          throw new Error(_errMsg)
+          };    
     }
 
     function __setAppPreferences(){
