@@ -14,7 +14,7 @@
 
     try{
         
-        var result = FileManager.save(null, true); // save and close
+        var result = FileManager.save(null, false); // save and close
         if(result != null){
             // call c# action
             var ret = br.doAction({
@@ -27,7 +27,11 @@
             })|| { success : false, msg: "Unhadled error" };
 
             if(!ret.success){
+                // error file will remain open
                 alert("Operazione FALITA!  [" + ret.msg + "]");
+            } else {
+                // No error
+                FileManager.closeCurrent();
             }
 
             br.log("C# response: " + JSON.stringify(ret));

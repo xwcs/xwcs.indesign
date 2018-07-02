@@ -157,7 +157,7 @@ var FileManager = (function(ind){
                     }                   
 
                     // close file
-                    if(doClose) _indesign.documents.item(0).close(SaveOptions.no);
+                    if (doClose) _indesign.activeDocument.close(SaveOptions.no);
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
@@ -170,6 +170,21 @@ var FileManager = (function(ind){
             }
 
             return ret;
+        },
+
+        closeCurrent: function () {
+
+            _errMsg = '';
+            _err = 0;
+
+            try {
+                _indesign.activeDocument.close(SaveOptions.no);
+            } catch (e) {
+                _err = e.number;
+                _errMsg = e.description;
+            } finally {
+                if (_errMsg != '') alert('Si è verificato l\'errore n°' + _err + '.\r' + _errMsg, "FileManager.save");
+            }
         }
     }
 

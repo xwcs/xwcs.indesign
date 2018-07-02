@@ -10,10 +10,11 @@
 #target "indesign"
 #targetengine "session_CsBridge"
 
-(
-function(br){
+(function(br){
+
     try{
-        var result = FileManager.save(null, true); // save and close
+        
+        var result = FileManager.save(null, false); // save and close
         if(result != null){
             // call c# action
             var ret = br.doAction({
@@ -23,12 +24,16 @@ function(br){
                     result.file.fullName, 
                     JSON.stringify(result.meta)
                 ]
-            }) || { success : false, msg: "Unhandled error" };
+            }) || { success : false, msg: "Unhadled error" };
 
             
 
             if(!ret.success){
-                alert("Operazione FALLITA!  [" + ret.msg + "]");
+                // error file will remain open
+                alert("Operazione FALITA!  [" + ret.msg + "]");
+            } else {
+                // No error
+                FileManager.closeCurrent();
             }
             br.log("C# response: " + JSON.stringify(ret));
         }
@@ -37,4 +42,5 @@ function(br){
     }catch(e){
         alert("Menu Error: " + e);
     }    
+
 })(CsBridge);
