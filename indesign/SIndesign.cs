@@ -396,7 +396,7 @@ namespace xwcs.indesign
                 return a.DoScript(
                     string.Format(@"
                         #target 'indesign';
-                        #targetengine 'session_CsBridge';
+                        #targetengine 'MB_BridgeRTF';
                         {0}", script),
                     global::InDesign.idScriptLanguage.idJavascript,
                     pms
@@ -453,7 +453,7 @@ namespace xwcs.indesign
 
 
             // recreate
-            Type type = Type.GetTypeFromProgID("InDesign.Application.CS6", true);
+            Type type = Type.GetTypeFromProgID("InDesign.Application.CC.2018", true);
             _app = (_Application) Activator.CreateInstance(type, true);
 
             string ver = (string)(ExecScriptInternal(_app, @"

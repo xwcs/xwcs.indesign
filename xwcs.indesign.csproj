@@ -155,7 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="InDesign">
-      <Guid>{F4B43528-68EA-4C29-8A18-6FBD8E3C24C4}</Guid>
+      <Guid>{76D0151D-8121-4BB3-9B29-4D137776EE97}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
@@ -163,6 +163,35 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\js\MB_BridgeRTF\01-provaTaggatura.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\02-provaSendAbstract.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\02-provaSendAbstract_Ivan.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\csBridgeInterface.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\libRTF.jsxbin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\MB_BridgeRTF\libRTF_connect.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="assets\js\xwcs.indesign\menu\SaveAbstract.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\js\xwcs.indesign\menu\TagDoc.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -176,7 +205,7 @@ popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties StartAt="636346368000000000" Versioning="1" IncrementAction="3" IncrementOnBuild="False" IncrementOnRebuild="True" IncrementInformational="True" />
+      <UserProperties IncrementInformational="True" IncrementOnRebuild="True" IncrementOnBuild="False" IncrementAction="3" Versioning="1" StartAt="636346368000000000" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

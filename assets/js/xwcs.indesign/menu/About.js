@@ -7,8 +7,8 @@
  * of 0ics srls
  *
  ******************************************************************************/
-#target "indesign"
-#targetengine "session_CsBridge"
+#target "indesign-13"
+#targetengine "MB_BridgeRTF"
 
 (function(br){
 
