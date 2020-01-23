@@ -7,7 +7,7 @@
  * of 0ics srls
  *
  ******************************************************************************/
-#target "indesign-13"
+#target "indesign-14"
 #targetengine "MB_BridgeRTF"
 
 #include "xwcs.indesign/bridge/support.js"

@@ -176,6 +176,15 @@
     <Content Include="assets\js\MB_BridgeRTF\libRTF_connect.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\js\xwcs.indesign\bridge\deferred.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\xwcs.indesign\bridge\deferred.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\js\xwcs.indesign\bridge\json2_src.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\js\xwcs.indesign\menu\SaveAbstract.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

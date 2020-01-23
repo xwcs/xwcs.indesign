@@ -453,7 +453,43 @@ namespace xwcs.indesign
 
 
             // recreate
-            Type type = Type.GetTypeFromProgID("InDesign.Application.CC.2018", true);
+            Type type;
+            try
+            {
+                type = Type.GetTypeFromProgID("InDesign.Application.2020", true);
+            }
+            catch (Exception ex1)
+            {
+                _logger.Debug("SIndesign.ResetApp InDesign.Application.2020 err: {0}", ex1.Message);
+                try
+                {
+                    type = Type.GetTypeFromProgID("InDesign.Application.CC.2019", true);
+                }
+                catch (Exception ex2)
+                {
+                    _logger.Debug("SIndesign.ResetApp InDesign.Application.CC.2019 err: {0}", ex2.Message);
+                    try
+                    {
+                        type = Type.GetTypeFromProgID("InDesign.Application.CC.2018", true);
+                    }
+                    catch (Exception ex3)
+                    {
+                        _logger.Debug("SIndesign.ResetApp InDesign.Application.CC.2018 err: {0}", ex3.Message);
+                        try
+                        {
+                            type = Type.GetTypeFromProgID("InDesign.Application", true);
+                        }
+                        catch (Exception ex4)
+                        {
+                            _logger.Debug("SIndesign.ResetApp InDesign.Application", ex4.Message);
+                        }
+
+                    }
+
+                }
+
+
+            }
             _app = (_Application) Activator.CreateInstance(type, true);
 
             string ver = (string)(ExecScriptInternal(_app, @"
