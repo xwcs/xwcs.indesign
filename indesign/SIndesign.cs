@@ -453,7 +453,7 @@ namespace xwcs.indesign
 
 
             // recreate
-            Type type = Type.GetTypeFromProgID("InDesign.Application.CS6", true);
+            Type type = Type.GetTypeFromProgID("InDesign.Application.CC.2019", true);
             _app = (_Application) Activator.CreateInstance(type, true);
 
             string ver = (string)(ExecScriptInternal(_app, @"
