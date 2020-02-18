@@ -396,7 +396,7 @@ namespace xwcs.indesign
                 return a.DoScript(
                     string.Format(@"
                         #target 'indesign';
-                        #targetengine 'session_CsBridge';
+                        #targetengine 'MB_BridgeRTF';
                         {0}", script),
                     global::InDesign.idScriptLanguage.idJavascript,
                     pms
@@ -453,7 +453,26 @@ namespace xwcs.indesign
 
 
             // recreate
-            Type type = Type.GetTypeFromProgID("InDesign.Application.CC.2019", true);
+            String indesingID = "InDesign.Application.CC.2019";
+            /**
+             * InDesign.Application.2020
+             * InDesign.Application.CC.2019
+             * InDesign.Application.CC.2018
+             * InDesign.Application
+             */
+
+            Type type;
+            try
+            {
+                type = Type.GetTypeFromProgID(indesingID, true);
+
+            }
+            catch (Exception ex1)
+            {
+                _logger.Debug("SIndesign.ResetApp " + indesingID + " err: {0}", ex1.Message);
+                type = null;
+            }
+            
             _app = (_Application) Activator.CreateInstance(type, true);
 
             string ver = (string)(ExecScriptInternal(_app, @"
@@ -467,10 +486,11 @@ namespace xwcs.indesign
             if (ver != Version)
             {
 
-                // load script
-                string scr = new Composer().Compose("id.js");
+        // load script
+       string scr = new Composer().Compose("id.js");
+        //string scr = new Composer().Compose("id_standalone.js");
 #if DEBUG_TRACE_LOG_ON
-                _logger.Debug("Script: {0}", scr.Substring(0, 512));
+        _logger.Debug("Script: {0}", scr.Substring(0, 512));
 #endif
                 // here we need also 3 options for to have paths
                 _app.DoScript(
@@ -528,7 +548,7 @@ namespace xwcs.indesign
 #endif
                     // remove task
                     _taskResults.Remove(taskid);
-                    throw new ApplicationException("Problem with InDesig ping!");
+                    throw new ApplicationException("Problem with InDesign ping!");
                 };
                 th.Check(); // start internal thread
             }

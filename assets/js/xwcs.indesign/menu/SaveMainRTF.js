@@ -7,13 +7,12 @@
  * of 0ics srls
  *
  ******************************************************************************/
-#target "indesign"
-#targetengine "session_CsBridge"
+#target "indesign-14"
+#targetengine "MB_BridgeRTF"
 
-(function(br){
-
+(
+function(br){
     try{
-        
         var result = FileManager.save(null, false); // save and close
         if(result != null){
             // call c# action
@@ -24,13 +23,13 @@
                     result.file.fullName, 
                     JSON.stringify(result.meta)
                 ]
-            }) || { success : false, msg: "Unhadled error" };
+            }) || { success : false, msg: "Unhandled error" };
 
             
 
             if(!ret.success){
                 // error file will remain open
-                alert("Operazione FALITA!  [" + ret.msg + "]");
+                alert("Operazione FALLITA!  [" + ret.msg + "]");
             } else {
                 // No error
                 FileManager.closeCurrent();

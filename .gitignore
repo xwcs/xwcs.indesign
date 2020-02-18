@@ -289,3 +289,5 @@ __pycache__/
 
 assets/js/lib.indesign
 *.bak
+/assets/js/null
+/assets/js/mklink
