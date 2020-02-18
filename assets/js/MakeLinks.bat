@@ -2,7 +2,10 @@
 rem set DEST=%appdata%\Adobe\InDesign\Version 8.0\it_IT\Scripts\Scripts Panel
 rem set DEST=C:\users\ivan.DOM_EGAF\AppData\Roaming\Adobe\InDesign\Version 8.0\it_IT\Scripts\Scripts Panel
 rem set DEST=%appdata%\Adobe\InDesign\Version 13.0\it_IT\Scripts\Scripts Panel
-set DEST=C:\users\ivan.DOM_EGAF\AppData\Roaming\Adobe\InDesign\Version 13.0\it_IT\Scripts\Scripts Panel
+rem set DEST=C:\users\ivan.DOM_EGAF\AppData\Roaming\Adobe\InDesign\Version 13.0\it_IT\Scripts\Scripts Panel
+
+set DEST=%appdata%\Adobe\InDesign\Version 14.0\it_IT\Scripts\Scripts Panel
+
 if EXIST "%DEST%\js" goto end
 rem mklink "%DEST%\js" "%cd%" /D
 mklink "%DEST%\js" "%~dp0" /D
