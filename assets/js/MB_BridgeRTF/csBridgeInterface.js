@@ -1,0 +1,1 @@
+﻿//INTERFACCIA CON CS BRIDGE//INSERIRE VERE CHIAMATEfunction GET_AbstracList(){	return [{"Doc":"Tipo documento"},{"Doc":"Data"},{"Doc":"Numero"},{"Doc":"Protocollo"},{"Doc":"Organo emittente"},{"Doc":"Fonte"},{"Doc":"Fonte data"},{"Doc":"Fonte numero"},{"Doc":"Oggetto"}]}	function PUT_DocAbstract(risp){  $.writeln(risp.abstractArray)	//alert(risp.abstractArray)}	

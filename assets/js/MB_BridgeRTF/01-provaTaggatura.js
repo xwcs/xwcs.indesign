@@ -1,0 +1,1 @@
+﻿#targetengine "MB_BridgeRTF"#include libRTF_connect.jsMENU_Installa()DOC_TAG(app.activeDocument)

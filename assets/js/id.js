@@ -7,8 +7,8 @@
  * of 0ics srls
  *
  ******************************************************************************/
-#target "indesign"
-#targetengine "session_CsBridge"
+#target "indesign-14"
+#targetengine "MB_BridgeRTF"
 
 #include "xwcs.indesign/bridge/support.js"
 
@@ -18,6 +18,7 @@
 
 #include "xwcs.indesign/bridge/menu.js"
 
+#include "MB_BridgeRTF/libRTF_connect.js"
 
 // activate new menus
 (function(br)
@@ -26,20 +27,26 @@
     
     MenuHelper.addMenus( 
         // name
-        "C#",
+        "BackOffice",
         // features
         [
+            { caption: "Prepara RTF per tag", fileName: "xwcs.indesign/menu/TagDoc.js", subName: "" },
+            { caption: "Salva abstract", fileName: "xwcs.indesign/menu/SaveAbstract.js", subName: "" },
+            { separator: true, subName: "" },
             { caption: "Incolla RTF", fileName: "xwcs.indesign/menu/SaveRTF.js", subName: "" },
             { caption: "Incolla RTF PRINCIPALE", fileName: "xwcs.indesign/menu/SaveMainRTF.js", subName: "" },
             { separator: true, subName: "" },
+            { caption: "Trova destinazione della selezione", fileName: "lib.indesign/LoadDataFromDb.js", subName: "" },
+            { separator: true, subName: "" },
             { caption: "Prova", fileName: "xwcs.indesign/menu/Action.js", subName: "" },
             { separator: true, subName: "" },
-            { caption: "Info", fileName: "xwcs.indesign/menu/About.js", subName: "" }			
+            { caption: "Info", fileName: "xwcs.indesign/menu/About.js", subName: "" }		
         ],
         // INDESIGN_ROOT_MENU 
         _br.Indesign().menus.item( '$ID/Main' ),
         // LO_END
         LocationOptions.atEnd
     );
-
+  //Activate context menu from libRTF
+  MENU_Installa()
 })(CsBridge);
