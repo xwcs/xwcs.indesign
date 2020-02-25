@@ -457,26 +457,26 @@ namespace xwcs.indesign
 
 
       // recreate
-      Type type;
+            String indesingID = "InDesign.Application.CC.2019";
+            /**
+             * InDesign.Application.2020
+             * InDesign.Application.CC.2019
+             * InDesign.Application.CC.2018
+             * InDesign.Application
+             */
 
-      /*
-      try
-      {
-        type = Type.GetTypeFromProgID("InDesign.Application.2020", true);
-      }
-      catch (Exception ex1)
-      */
-      {
-        // _logger.Debug("SIndesign.ResetApp InDesign.Application.2020 err: {0}", ex1.Message);
-        try
-        {
-          type = Type.GetTypeFromProgID("InDesign.Application.CC.2019", true);
-        }
-        catch (Exception ex2)
-        {
-          _logger.Debug("SIndesign.ResetApp InDesign.Application.CC.2019 err: {0}", ex2.Message);
-          try
-          {
+            Type type;
+            try
+            {
+                type = Type.GetTypeFromProgID(indesingID, true);
+
+            }
+            catch (Exception ex1)
+            {
+                _logger.Debug("SIndesign.ResetApp " + indesingID + " err: {0}", ex1.Message);
+                type = null;
+            }
+            
             type = Type.GetTypeFromProgID("InDesign.Application.CC.2018", true);
           }
           catch (Exception ex3)
