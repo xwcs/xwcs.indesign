@@ -110,7 +110,7 @@ namespace xwcs.indesign
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(ex.Message);
+                        _logger.Error(ex.ToString());
                     }
                 }
             }
@@ -215,7 +215,7 @@ namespace xwcs.indesign
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error(ex.ToString());
                 if (tcpClient.Connected)
                     tcpClient.Close();
             }
