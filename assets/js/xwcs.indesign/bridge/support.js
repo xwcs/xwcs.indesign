@@ -11,52 +11,52 @@
 
 // global features
 Object.prototype.MakeClone = function(obj){
-    var str = JSON.stringify(obj, function(k,v){
-        // handle enums, enumerable implicitly converted to string will return number, but toString return string value
-        try{
-            if((v + '') !=  v.toString()){
-                return  v.toString(); 
-            }
-        }catch(e){}
+  var str = JSON.stringify(obj, function(k,v){
+    // handle enums, enumerable implicitly converted to string will return number, but toString return string value
+    try{
+      if((v + '') !=  v.toString()){
+        return  v.toString(); 
+      }
+    }catch(e){}
        
-        // skip parent 
-        return  (k == 'parent') ? undefined : v;
-    });
-    return JSON.parse(str);
+    // skip parent 
+    return  (k == 'parent') ? undefined : v;
+  });
+  return JSON.parse(str);
 }
 
 /*
     Logger factory singleton
 */
 var LoggerFactory = (function (ind) {
-    var _indesign = ind;
+  var _indesign = ind;
 
-    var ret = {
-        getLogger : function(path){
-            return __openLogger(Folder.temp + '/' + path);
-        }
-    };
+  var ret = {
+    getLogger : function(path){
+      return __openLogger(Folder.temp + '/' + path);
+    }
+  };
 
     
 
-    var __openLogger = function (path){
+  var __openLogger = function (path){
         
-        return {
-            log : function(msg){
-                 var f = new File(path);
-                f.open("e");
-                f.seek(0, 2);
+    return {
+      log : function(msg){
+        var f = new File(path);
+        f.open("e");
+        f.seek(0, 2);
 
-                var d = new Date();
-                f.writeln(
-                    ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-                    d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" + ("0" + d.getSeconds()).slice(-2)
-                + " " + msg);
+        var d = new Date();
+        f.writeln(
+            ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+            d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" + ("0" + d.getSeconds()).slice(-2)
+        + " " + msg);
                 
-                f.close();
-            }            
-        };
+        f.close();
+      }            
     };
+  };
 
-    return ret;
+  return ret;
 })(app);
