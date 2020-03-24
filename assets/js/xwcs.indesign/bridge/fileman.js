@@ -284,7 +284,7 @@ var FileManager = (function(ind){
     }
 
     var _logger = null;
-    var __log = function(msg){
+    var __log = function(msg) {
         if(_logger == null){
             _logger = LoggerFactory.getLogger(CsBridge.options().log);
         }

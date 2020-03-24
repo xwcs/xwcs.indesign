@@ -28,7 +28,7 @@
     br.log("C# response: " + JSON.stringify(ret));
     if (ret.success) {
       br.log(ret.data);
-      alert(ret.data);
+      //alert(ret.data);
     } else {
       br.log("C# success: false");
       alert("Richiesta al server fallita");

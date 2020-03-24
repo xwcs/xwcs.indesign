@@ -139,7 +139,7 @@ namespace xwcs.indesign
 
                 // Buffer for reading data
                 byte[] lenB = new byte[11];
-                byte[] bytes = new byte[10000];
+                byte[] bytes = new byte[100000];
                 string data = null;
 
                 int i;
@@ -188,7 +188,7 @@ namespace xwcs.indesign
                     _logger.Debug("Received: {0}", data);
 #endif
 
-                        OnMessageEventArgs args = new OnMessageEventArgs(JsonConvert.DeserializeObject<xwcs.indesign.js.json.Message>(data));
+                        OnMessageEventArgs args = new OnMessageEventArgs(JsonConvert.DeserializeObject<xwcs.indesign.js.json.Message>(System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data))));
 
                         _wes_OnMessage.Raise(this, args);
 
@@ -198,13 +198,13 @@ namespace xwcs.indesign
                         {
                             resp.data = args.Result;
                         }
-                        data = JsonConvert.SerializeObject(resp);
+                        data = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resp)));
 
                         IEnumerable<byte> msg = Encoding.ASCII.GetBytes(data);
                         // write data, first size padded 10 char stringed number
                         int msglen = msg.Count();
                         string lstr = msglen.ToString("0000000000");
-                        await networkStream.WriteAsync(Encoding.ASCII.GetBytes(lstr).Concat(Encoding.ASCII.GetBytes(data)).ToArray(), 0, msglen + 10);
+                        await networkStream.WriteAsync(Encoding.ASCII.GetBytes(lstr).Concat(msg).ToArray(), 0, msglen + 10);
                       
 #if DEBUG_TRACE_LOG_ON
                         _logger.Debug("Sent: [{0}] -> {1}", lstr, data);

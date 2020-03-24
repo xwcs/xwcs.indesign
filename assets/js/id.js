@@ -10,6 +10,8 @@
 #target "indesign-14"
 #targetengine "MB_BridgeRTF"
 
+#include "xwcs.indesign/bridge/base64.js"
+
 #include "xwcs.indesign/bridge/support.js"
 
 #include "xwcs.indesign/bridge/bridge.js"
