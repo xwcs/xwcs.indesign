@@ -36,6 +36,8 @@ var FileManager = (function(ind){
         
             var fPath = path || "";
 
+            $.writeln ("Custom data: " + data + " path:" + path);
+
             __log("Custom data: " + data);
             
             // Ask user to open the RTF
@@ -49,7 +51,7 @@ var FileManager = (function(ind){
             }
             
             // block user
-            _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+           // _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
 
             if(rtfFile){
                 try {
@@ -63,8 +65,10 @@ var FileManager = (function(ind){
 			
                         __setAppPreferences();
 			
+                        $.writeln("before place:" + JSON.stringify(rtfFile));
                         // place the RTF
-                        _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
+                        var aaa = _myStory.insertionPoints.item(0).place(rtfFile.fsName,true, { autoflowing: true});
+                        $.writeln("after place:" + JSON.stringify(aaa));
 			
                         // save the RTF path into story label
                         var lData = {
@@ -72,17 +76,23 @@ var FileManager = (function(ind){
                             meta : typeof(data) == "string" ? JSON.parse(data) : data
                         }
                         data.RtfFilePath = rtfFile.fsName;
+                        var bbb = _myStory;
                         _myStory.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //_indesign.activeDocument.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //__restoreAppPreferences();
+
+                        $.writeln ("file open:" + _myStory.label );
                         
                     }else{
+                        
                         _err = -43;
                         _errMsg = 'Il template \r"'+_indtPath+'"\r non esiste o non ha frame nella prima pagina.';
+                        $.writeln (_errMsg);
                     }
                 }catch(e){
                     _err = e.number;
                     _errMsg = e.description;
+                    $.writeln (_errMsg);
                 }finally{
                     if(_errMsg != '') alert (_errMsg, "FileManager.open");
                 }
@@ -284,10 +294,12 @@ var FileManager = (function(ind){
     }
 
     var _logger = null;
-    var __log = function(msg) {
+    var __log = function (msg) {
+
         if(_logger == null){
             _logger = LoggerFactory.getLogger(CsBridge.options().log);
         }
+        
         _logger.log("Filemanager : " + msg);
     };
     
