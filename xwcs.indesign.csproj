@@ -197,7 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="InDesign">
-      <Guid>{38E74CB3-2251-472E-A9C3-922526043955}</Guid>
+      <Guid>{C12DDD4E-6CDC-4C7B-AE0E-A98E01E0FA59}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
@@ -227,7 +227,7 @@ popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties StartAt="636346368000000000" Versioning="1" IncrementAction="3" IncrementOnBuild="False" IncrementOnRebuild="True" IncrementInformational="True" />
+      <UserProperties IncrementInformational="True" IncrementOnRebuild="True" IncrementOnBuild="False" IncrementAction="3" Versioning="1" StartAt="636346368000000000" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
