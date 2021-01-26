@@ -22,7 +22,21 @@ var FileManager = (function(ind){
     var _errMsg = '';
     var _myStory;
     var _myLabel;
-    var  _prefsBackup;
+    //var  _prefsBackup;
+	var	_convertPageBreaks,
+		_convertTablesTo,
+		_importEndnotes,
+		_importFootnotes,
+		_importIndex,
+		_importTOC,
+		_importUnusedStyles,
+		_preserveGraphics,
+		_preserveLocalOverrides,
+		_preserveTrackChanges,
+		_removeFormatting,
+		_resolveParagraphStyleClash,
+		_resolveCharacterStyleClash,
+		_useTypographersQuotes;
     var _indtPath = __getScriptPath() + '/tmpl/'+ TEMPLATE_FILE_NAME;
 
     var ret = {
@@ -40,6 +54,14 @@ var FileManager = (function(ind){
             
             // Ask user to open the RTF
             _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
+			// Non capisco perché Giulivi abbia invece gestito la cosa nel modo che segue: se non riesce ad assegnare vero assegna falso, altrimenti vero. Boh!
+			/*
+			if(app.wordRTFImportPreferences.useTypographersQuotes = true){ 
+				app.wordRTFImportPreferences.useTypographersQuotes = false 
+			}else{ 
+				app.wordRTFImportPreferences.useTypographersQuotes = true 
+			} 
+			*/
             
             var rtfFile = null;
 
@@ -60,11 +82,34 @@ var FileManager = (function(ind){
                     if (_myStory){
 		
                         //$.writeln(rtfFile.fsName);
-			
+
                         __setAppPreferences();
-			
-                        // place the RTF
-                        _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
+						
+						// Import on a temporary doc to avoid styles garbage
+						// BEGIN
+						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+						var _docTemp = _indesign.documents.add()
+						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+						var _boxTemp = _docTemp.textFrames.add()
+						_boxTemp.geometricBounds = [0,0,1000,1000]
+						var _storyTemp =  _boxTemp.parentStory
+						_storyTemp.insertionPoints.item(0).place(rtfFile.fsName,false);
+						_indesign.selection = null
+						for (var i = 0; i < _storyTemp.texts.length; i++){
+							if (i > 0){
+								_storyTemp.texts[i].select(SelectionOptions.ADD_TO)
+							} else {
+								_storyTemp.texts[i].select()
+							}
+						}
+						_indesign.copy()
+						_docTemp.close(SaveOptions.no)
+						_myStory.insertionPoints.item(0).select()
+						_indesign.paste()
+						// END
+						
+                        // The RTF is already placed
+                        // _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
 			
                         // save the RTF path into story label
                         var lData = {
@@ -208,6 +253,7 @@ var FileManager = (function(ind){
             }
         }
     }
+
     function __initSave() {
         var myDocument;
         var myPage;
@@ -249,8 +295,23 @@ var FileManager = (function(ind){
 
     function __setAppPreferences(){
         // save current settings
-        _prefsBackup = _indesign.wordRTFImportPreferences.properties;
-
+		// in the ID enviroment, object properties are placeholders that are evaluated only when instantiated, so I prefer to save very single property needed
+        //_prefsBackup = _indesign.wordRTFImportPreferences.properties;
+		_convertPageBreaks = _indesign.wordRTFImportPreferences.convertPageBreaks;
+		_convertTablesTo = _indesign.wordRTFImportPreferences.convertTablesTo;
+		_importEndnotes = _indesign.wordRTFImportPreferences.importEndnotes;
+		_importFootnotes = _indesign.wordRTFImportPreferences.importFootnotes;
+		_importIndex = _indesign.wordRTFImportPreferences.importIndex;
+		_importTOC = _indesign.wordRTFImportPreferences.importTOC;
+		_importUnusedStyles = _indesign.wordRTFImportPreferences.importUnusedStyles;
+		_preserveGraphics = _indesign.wordRTFImportPreferences.preserveGraphics;
+		_preserveLocalOverrides = _indesign.wordRTFImportPreferences.preserveLocalOverrides;
+		_preserveTrackChanges = _indesign.wordRTFImportPreferences.preserveTrackChanges;
+		_removeFormatting = _indesign.wordRTFImportPreferences.removeFormatting;
+		_resolveParagraphStyleClash = _indesign.wordRTFImportPreferences.resolveParagraphStyleClash;
+		_resolveCharacterStyleClash = _indesign.wordRTFImportPreferences.resolveCharacterStyleClash;
+		_useTypographersQuotes = _indesign.wordRTFImportPreferences.useTypographersQuotes;
+		
         // set predefined settings for the script
         _indesign.wordRTFImportPreferences.convertPageBreaks = ConvertPageBreaks.NONE;
         _indesign.wordRTFImportPreferences.convertTablesTo = ConvertTablesOptions.UNFORMATTED_TABBED_TEXT;
@@ -263,13 +324,29 @@ var FileManager = (function(ind){
         _indesign.wordRTFImportPreferences.preserveLocalOverrides = true;
         _indesign.wordRTFImportPreferences.preserveTrackChanges = true;
         _indesign.wordRTFImportPreferences.removeFormatting = false;
-        _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
-        _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
+		_indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_USE_EXISTING;
+        _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_USE_EXISTING;
+        // _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
+        // _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
         _indesign.wordRTFImportPreferences.useTypographersQuotes = true;
     }
 
     function __restoreAppPreferences() {
-        _indesign.wordRTFImportPreferences.properties = _prefsBackup;
+        // _indesign.wordRTFImportPreferences.properties = _prefsBackup;
+		_indesign.wordRTFImportPreferences.convertPageBreaks = _convertPageBreaks;
+		_indesign.wordRTFImportPreferences.convertTablesTo = _convertTablesTo;
+		_indesign.wordRTFImportPreferences.importEndnotes = _importEndnotes;
+		_indesign.wordRTFImportPreferences.importFootnotes = _importFootnotes;
+		_indesign.wordRTFImportPreferences.importIndex = _importIndex;
+		_indesign.wordRTFImportPreferences.importTOC = _importTOC;
+		_indesign.wordRTFImportPreferences.importUnusedStyles = _importUnusedStyles;
+		_indesign.wordRTFImportPreferences.preserveGraphics = _preserveGraphics;
+		_indesign.wordRTFImportPreferences.preserveLocalOverrides = _preserveLocalOverrides;
+		_indesign.wordRTFImportPreferences.preserveTrackChanges = _preserveTrackChanges;
+		_indesign.wordRTFImportPreferences.removeFormatting = _removeFormatting;
+		_indesign.wordRTFImportPreferences.resolveParagraphStyleClash = _resolveParagraphStyleClash;
+		_indesign.wordRTFImportPreferences.resolveCharacterStyleClash = _resolveCharacterStyleClash;
+		_indesign.wordRTFImportPreferences.useTypographersQuotes = _useTypographersQuotes;
     }
 
     function __getScriptPath() {
