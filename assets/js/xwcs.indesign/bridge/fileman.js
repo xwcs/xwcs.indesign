@@ -57,9 +57,9 @@ var FileManager = (function(ind){
 			// Non capisco perché Giulivi abbia invece gestito la cosa nel modo che segue: se non riesce ad assegnare vero assegna falso, altrimenti vero. Boh!
 			/*
 			if(app.wordRTFImportPreferences.useTypographersQuotes = true){ 
-				app.wordRTFImportPreferences.useTypographersQuotes = false 
-			}else{ 
-				app.wordRTFImportPreferences.useTypographersQuotes = true 
+				app.wordRTFImportPreferences.useTypographersQuotes = false;
+			} else { 
+				app.wordRTFImportPreferences.useTypographersQuotes = true;
 			} 
 			*/
             
@@ -85,27 +85,40 @@ var FileManager = (function(ind){
 
                         __setAppPreferences();
 						
-						// Import on a temporary doc to avoid styles garbage
+						// Import to a temporary doc to avoid styles garbage
 						// BEGIN
 						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
-						var _docTemp = _indesign.documents.add()
+						var docTemp = _indesign.documents.add();
 						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
-						var _boxTemp = _docTemp.textFrames.add()
-						_boxTemp.geometricBounds = [0,0,1000,1000]
-						var _storyTemp =  _boxTemp.parentStory
-						_storyTemp.insertionPoints.item(0).place(rtfFile.fsName,false);
-						_indesign.selection = null
-						for (var i = 0; i < _storyTemp.texts.length; i++){
+						var boxTemp = docTemp.textFrames.add();
+						boxTemp.geometricBounds = [0,0,1000,1000];
+						var storyTemp =  boxTemp.parentStory;
+						storyTemp.insertionPoints.item(0).place(rtfFile.fsName,false);
+						_indesign.selection = null;
+						for (var i = 0; i < storyTemp.texts.length; i++){
 							if (i > 0){
-								_storyTemp.texts[i].select(SelectionOptions.ADD_TO)
+								storyTemp.texts[i].select(SelectionOptions.ADD_TO);
 							} else {
-								_storyTemp.texts[i].select()
+								storyTemp.texts[i].select();
 							}
 						}
-						_indesign.copy()
-						_docTemp.close(SaveOptions.no)
-						_myStory.insertionPoints.item(0).select()
-						_indesign.paste()
+						//$.writeln("storyTemp.contents: " + storyTemp.contents.slice(0, 40));
+						//$.writeln("typeof docTemp: " + typeof docTemp);
+						if (storyTemp.contents) {
+							//$.writeln("DENTRO if (storyTemp.contents)");
+							_indesign.copy();
+							//$.writeln("AFTER _indesign.copy()");
+							docTemp.close(SaveOptions.no);
+							docTemp = undefined;
+							_myStory.insertionPoints.item(0).select();
+							//$.writeln("BEFORE _myStory.contents: " + _myStory.contents.slice(0, 40));
+							_indesign.paste();
+							//$.writeln("AFTER _myStory.contents: " + _myStory.contents.slice(0, 40));
+						}
+						if (docTemp){
+							//$.writeln("typeof docTemp: " + typeof docTemp);
+							docTemp.close(SaveOptions.no);
+						}
 						// END
 						
                         // The RTF is already placed
@@ -117,7 +130,9 @@ var FileManager = (function(ind){
                             meta : typeof(data) == "string" ? JSON.parse(data) : data
                         }
                         data.RtfFilePath = rtfFile.fsName;
-                        _myStory.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        _myStory.label = JSON.stringify(lData);
+						//$.writeln("_myStory.label" + _myStory.label);
+						//iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //_indesign.activeDocument.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //__restoreAppPreferences();
                         
@@ -171,7 +186,14 @@ var FileManager = (function(ind){
                 
                 __initSave();
                 if (_myStory) {
-
+					//$.writeln("save: _myStory.label" + _myStory.label);
+					// Apply default replaces to standardize document
+					__pulisciRTF(_indesign.activeDocument);
+					
+					// Elimina la riga vuota inserita da ID dopo tutte le tabelle
+					__EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
+					
+					
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
                     var data = JSON.parse(_myLabel);
@@ -359,6 +381,196 @@ var FileManager = (function(ind){
         if(a.length > 0) a.pop();
         return (a.join ("/") + "/");
     }
+	
+
+	function __pulisciRTF (myDocument) {
+		// Parametri: __cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 )
+		
+		// Create default styles if missing
+		__verifyStyle(myDocument, "TITOLO_SOMMARIO");
+		__verifyStyle(myDocument, "TESTO")
+		
+		//Imposto parametri di change
+		__initReplace();
+		
+		// ex cambiagrep
+		__cambia(myDocument, "  +", " ", true, false, false, false, false, false);
+		__cambia(myDocument, "A’|A'", "À", true, false, false, false, false, false);
+		__cambia(myDocument, "E’|E'", "È", true, false, false, false, false, false);
+		__cambia(myDocument, "I’|I'", "Ì", true, false, false, false, false, false);
+		__cambia(myDocument, "O’|O'", "Ò", true, false, false, false, false, false);
+		__cambia(myDocument, "U’|U'", "Ù", true, false, false, false, false, false);
+		__cambia(myDocument, "a’|a'", "à", true, false, false, false, false, false);
+		__cambia(myDocument, "e’|e'", "è", true, false, false, false, false, false);
+		__cambia(myDocument, "i’|i'", "ì", true, false, false, false, false, false);
+		__cambia(myDocument, "o’|o'", "ò", true, false, false, false, false, false);
+		__cambia(myDocument, "u’|u'", "ù", true, false, false, false, false, false);
+		__cambia(myDocument, " $", "");
+		
+		//ex cambia
+		__cambia(myDocument, "( ", "(", false, false, false, false, false, false);
+		__cambia(myDocument, " )", ")", false, false, false, false, false, false);
+		__cambia(myDocument, " :", ":", false, false, false, false, false, false);
+		__cambia(myDocument, " ,", ",", false, false, false, false, false, false);
+		__cambia(myDocument, " ;", ";", false, false, false, false, false, false);
+		__cambia(myDocument, "«", "“", false, false, false, false, false, false);
+		__cambia(myDocument, "»", "”", false, false, false, false, false, false);
+		__cambia(myDocument, "–", "-", false, false, false, false, false, false);
+		__cambia(myDocument, "“", "\"", false, false, false, false, false, false);
+		__cambia(myDocument, "”", "\"", false, false, false, false, false, false);
+		__cambia(myDocument, "…", "...", false, false, false, false, false, false);
+		__cambia(myDocument, "^k", "", false, false, false, false, false, false);
+		
+		//ex cambiagrep2 (in realtà il nome non era giusto non eseguiva un changeGrep, ma un changeText)
+		__cambia(myDocument, "pò","po'", false, true, false, false, false, false);
+
+		
+		// ex cambia_bold (ripetere la riga per ciascuno stile da sostituire)
+		__cambia(myDocument, "(", "(", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "(", "(", false, false, "Bold Italic", "Italic", false, false);
+		
+		__cambia(myDocument, ")", ")", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ")", ")", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ".", ".", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ".", ".", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ":", ":", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ":", ":", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ";", ";", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ";", ";", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ",", ",", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ",", ",", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "“", "“", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "“", "“", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "”", "”", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "”", "”", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "\"", "\"", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "\"", "\"", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "•", "•", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "•", "•", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "-", "-", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "-", "-", false, false, "Bold Italic", "Italic", false, false);
+		
+		// Change pagragraph style
+		__cambia(myDocument, "^p^p", "^p^p", false, false, false, false, "TITOLO_SOMMARIO", "TESTO");
+		
+		//Reset of replace parameters
+		__resetReplace();
+	}
+
+	function __initReplace () {
+		//changeText options
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		_indesign.changeTextPreferences = NothingEnum.nothing;
+		_indesign.findChangeTextOptions.caseSensitive = false;
+		_indesign.findChangeTextOptions.includeFootnotes = true;
+		_indesign.findChangeTextOptions.includeHiddenLayers = false;
+		_indesign.findChangeTextOptions.includeLockedLayersForFind = false;
+		_indesign.findChangeTextOptions.includeLockedStoriesForFind = false;
+		_indesign.findChangeTextOptions.includeMasterPages = false;
+		_indesign.findChangeTextOptions.wholeWord = false;
+		
+		// changeGrep options
+		_indesign.findGrepPreferences = NothingEnum.nothing;
+		_indesign.changeGrepPreferences = NothingEnum.nothing;
+		_indesign.findChangeGrepOptions.includeFootnotes = true;
+		_indesign.findChangeGrepOptions.includeHiddenLayers = false;
+		_indesign.findChangeGrepOptions.includeLockedLayersForFind = false;
+		_indesign.findChangeGrepOptions.includeLockedStoriesForFind = false;
+		_indesign.findChangeGrepOptions.includeMasterPages = false;
+	}
+
+	function __resetReplace () {
+		//changeText options
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		_indesign.changeTextPreferences = NothingEnum.nothing;
+		
+		// changeGrep options
+		_indesign.findGrepPreferences = NothingEnum.nothing;
+		_indesign.changeGrepPreferences = NothingEnum.nothing;
+	}
+	
+	function __cambia(myDocument, stringa1, stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 ) {
+		//https://indesignsecrets.com/resources/grep
+		//https://indesignsecrets.com/favorite-grep-expressions-you-can-use.php
+		//https://indesignsecrets.com/grep-and-text-metacharacter-cheat-sheet.php
+		//https://indesignsecrets.com/removing-the-paragraph-return-at-the-end-of-story.php
+		//https://indesignsecrets.com/findbetween-a-useful-grep-string.php
+		
+		__initReplace();
+		if (grep) {
+			_indesign.findGrepPreferences.findWhat = stringa1;
+			_indesign.changeGrepPreferences.changeTo = stringa2;
+			// Do replace
+			myDocument.changeGrep();
+		} else {
+			_indesign.findTextPreferences.findWhat = stringa1;
+			_indesign.changeTextPreferences.changeTo = stringa2;
+			if (wholeword) {
+				_indesign.findChangeTextOptions.wholeWord = true;
+			}
+			if (fontstyle1 && fontstyle2) {
+				_indesign.findTextPreferences.fontStyle = fontstyle1;
+				_indesign.changeTextPreferences.fontStyle = fontstyle2;
+			}
+			if (parastyle1 && parastyle2) {
+				_indesign.findTextPreferences. appliedParagraphStyle = parastyle1;
+				_indesign.changeTextPreferences.appliedParagraphStyle = parastyle2;
+			}
+			// Do replace
+			myDocument.changeText();
+		}
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		__resetReplace();
+	}
+
+
+	function __verifyStyle(myDocument, mystyle){
+	var style, myName;
+	try{
+			style = myDocument.paragraphStyles.item(mystyle);
+			//If the paragraph style does not exist, trying to get its name will generate an error.
+			myName = style.name;
+		}
+		catch (myError){
+			//The paragraph style did not exist, so create it.
+			style = myDocument.paragraphStyles.add({name:mystyle});
+		}
+	}
+	
+	function __EliminaRigaVuotaDopoTabella(myDocument, myStory) {
+		//__cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 ) {
+		//Pulisco le righe costituite solo da spaziature
+		__cambia(myDocument, "^[ |\\t]+$", "", true, false, false, false, false, false);
+		for (var j = 0; j < myStory.paragraphs.length; j++) {
+			var currPara = myStory.paragraphs[j];
+			if (currPara == null || currPara == undefined ) {
+				// continue;
+			} else {
+				if (currPara.tables.length>0) {
+					var k = j;
+					k++;
+					//alert (myStory.paragraphs[j].contents + " " + myStory.paragraphs[k].contents);
+					if (myStory.paragraphs[k].isValid && myStory.paragraphs.length >= k && (myStory.paragraphs[k].contents == "\r" || myStory.paragraphs[k].contents == "\n" || myStory.paragraphs[k].contents == "")) {
+						myStory.paragraphs[k].remove();
+					j--;
+					}
+				}
+			}
+		}
+
+		//Tolgo gli spazi vuoti alla fine della story
+		//non toglie i tag figure (voci d'indice xe identificati come ~I) che ID include nel \s
+		__cambia(myDocument, "[\\s^~I]+\\Z", "\\r", true, false, false, false, false, false);
+	}
 
     var _logger = null;
     var __log = function(msg) {
