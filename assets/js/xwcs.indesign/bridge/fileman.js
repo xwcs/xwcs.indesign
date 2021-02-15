@@ -186,13 +186,18 @@ var FileManager = (function(ind){
                 
                 __initSave();
                 if (_myStory) {
-					//$.writeln("save: _myStory.label" + _myStory.label);
-					// Apply default replaces to standardize document
-					__pulisciRTF(_indesign.activeDocument);
-					
-					// Elimina la riga vuota inserita da ID dopo tutte le tabelle
-					__EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
-					
+			//$.writeln("save: _myStory.label" + _myStory.label);
+			// Apply default replaces to standardize document
+			__pulisciRTF(_indesign.activeDocument);
+			
+			// Elimina la riga vuota inserita da ID dopo tutte le tabelle
+			__EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
+
+			//Controlla gli eventuali glifi inesistenti nei font del documento
+			//_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+			if (__FindMissingGlyph(_indesign.activeDocument)) {
+				throw new Error(-43, 'Sono presenti glifi senza font. Impossibile continuare.');
+			}
 					
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
@@ -571,6 +576,37 @@ var FileManager = (function(ind){
 		//non toglie i tag figure (voci d'indice xe identificati come ~I) che ID include nel \s
 		__cambia(myDocument, "[\\s^~I]+\\Z", "\\r", true, false, false, false, false, false);
 	}
+
+
+	function __FindMissingGlyph(myDocument){
+		var missing = false
+		var founded = [];
+		var numFonts = myDocument.fonts.length;
+		for (var z=0;z<numFonts;z++) {
+			var fontS = myDocument.fonts[z]
+			var fontName = fontS.fontFamily + "\t" + fontS.fontStyleName
+			founded = [];
+			_indesign.findGlyphPreferences = NothingEnum.nothing;
+			_indesign.findGlyphPreferences = NothingEnum.nothing;
+			_indesign.findGlyphPreferences.glyphID  = 0;
+			_indesign.findGlyphPreferences.appliedFont = fontName;
+			founded = _indesign.findGlyph ();
+			if (founded.length>0) {
+				//$.writeln(founded.length+ ' Trovati glyphi mancanti in  ' + fontName );
+				missing = true
+				for (var y=0;y<founded.length;y++) {
+					//$.writeln( founded[y].contents+ '   ' +founded[y].contents.charCodeAt(0) );
+					founded[y].select();
+					_indesign.layoutWindows[0].zoomPercentage = 120;
+					if (confirm("Trovati glifi mancanti per font:\r\n" + fontName + "\r\n\r\nVuoi sostituire?", undefined, "Glifi mancanti")) {
+						exit();
+					}
+				}
+			}
+		}
+		return missing
+	}
+		
 
     var _logger = null;
     var __log = function(msg) {
