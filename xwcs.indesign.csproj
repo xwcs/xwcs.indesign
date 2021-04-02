@@ -188,6 +188,9 @@
     <Content Include="assets\js\xwcs.indesign\bridge\json2_src.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\js\xwcs.indesign\menu\GetOpereFromNrecord.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\js\xwcs.indesign\menu\SaveAbstract.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -227,7 +230,7 @@ popd</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties IncrementInformational="True" IncrementOnRebuild="True" IncrementOnBuild="False" IncrementAction="3" Versioning="1" StartAt="636346368000000000" />
+      <UserProperties StartAt="636346368000000000" Versioning="1" IncrementAction="3" IncrementOnBuild="False" IncrementOnRebuild="True" IncrementInformational="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
