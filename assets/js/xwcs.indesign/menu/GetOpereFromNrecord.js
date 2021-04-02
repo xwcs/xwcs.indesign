@@ -387,7 +387,7 @@
     function appendNotes(myStory, numnote, text) {
         if (text) {
             //Accodo in fondo al testo della story
-            var nota = "\r\t(" + numnote + ")\t" + text + "\r";
+            var nota = "\t(" + numnote + ")\t" + text + "\r";
             myStory.insertionPoints[-1].contents = nota;
             // Per applicare uno stile particolare alla nota appena aggiunta, occorre risalire al paragrafo
             // che ho appena aggiunto, passando per insertionPoint
