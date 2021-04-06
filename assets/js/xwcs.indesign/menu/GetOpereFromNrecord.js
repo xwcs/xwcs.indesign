@@ -155,6 +155,7 @@
         if (true) {
             delete_tags(currDoc);
         }
+        changeNoteReferencesCharacterStyle(currStory,numnote);
         if (tags.keep_note) {
             var nota = appendNotes(currStory,numnote,opere);
         }
@@ -356,28 +357,28 @@
     function getOpereFromBO(nrecord) {
         if (!nrecord || isNaN(parseInt(nrecord))) {
             alert("Attenzione!" + "\n" + "NRECORD mancante o non numerico");
-           exit();
+            exit();
         }
         try {
-                // call c# action
-                var ret = br.doAction({
-                    what: 'MakeVedasiForNrecord',
-                    args: [
-                        nrecord
-                    ]
-                })|| {
-                    success: false,
-                    msg: "Unhandled error"
-                };
-                if (!ret.success) {
-                    // error file will remain open
-                    alert("Operazione FALLITA!  [" + ret.errmsg + "]");
-                    return false;
-                } else {
-                    // No error
-                    return ret;
-                }
-                br.log("C# response: " + JSON.stringify(ret));
+            // call c# action
+            var ret = br.doAction({
+                what: 'MakeVedasiForNrecord',
+                args: [
+                    nrecord
+                ]
+            })|| {
+                success: false,
+                msg: "Unhandled error"
+            };
+            if (!ret.success) {
+                // error file will remain open
+                alert("Operazione FALLITA!  [" + ret.errmsg + "]");
+                return false;
+            } else {
+                // No error
+                return ret;
+            }
+            br.log("C# response: " + JSON.stringify(ret));
         } catch (e) {
             alert(e);
             return false;
@@ -400,6 +401,21 @@
             placedstory = tframe.parentStory;
             placedstory.insertionPoints[-1].contents = nota"
             */
+        }
+    }
+    function changeNoteReferencesCharacterStyle(myStory, numnote) {
+        if (numnote) {
+            app.findGrepPreferences = NothingEnum.nothing;
+            app.changeGrepPreferences = NothingEnum.nothing;
+            app.findGrepPreferences.findWhat = "\\(" + numnote + "\\)";
+            //app.changeGrepPreferences.changeTo = "\(" + numnote + "\)";
+            allFounds = app.activeDocument.findGrep();
+            for (var i = 0; i < allFounds.length; i++) {
+                var curFound = allFounds[i];
+                curFound.select();
+                //curFound.changeGrep();
+                curFound.pointSize = "8pt";
+            }
         }
     }
 })(CsBridge);
