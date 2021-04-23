@@ -223,7 +223,7 @@ var FileManager = (function(ind){
                             var p = _indesign.pdfExportPresets.firstItem();
 														$.writeln('before SaveRTF: ' + Date.now());
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
-														$.writeln('before SaveRTF: ' + Date.now());
+														$.writeln('after SaveRTF: ' + Date.now());
                             ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
