@@ -188,17 +188,20 @@ var FileManager = (function(ind){
                 if (_myStory) {
 			//$.writeln("save: _myStory.label" + _myStory.label);
 			// Apply default replaces to standardize document
+			$.writeln('Before __pulisciRTF: ' + Date.now());
 			__pulisciRTF(_indesign.activeDocument);
-			
+			$.writeln('After __pulisciRTF: ' + Date.now());
 			// Elimina la riga vuota inserita da ID dopo tutte le tabelle
+			$.writeln('before __EliminaRigaVuotaDopoTabella: ' + Date.now());
 			__EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
-
+			$.writeln('after __EliminaRigaVuotaDopoTabella: ' + Date.now());
 			//Controlla gli eventuali glifi inesistenti nei font del documento
 			//_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+			$.writeln('before __FindMissingGlyph: ' + Date.now());
 			if (__FindMissingGlyph(_indesign.activeDocument)) {
 				throw new Error(-43, 'Sono presenti glifi senza font. Impossibile continuare.');
 			}
-					
+			$.writeln('after __FindMissingGlyph: ' + Date.now());		
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
                     var data = JSON.parse(_myLabel);
@@ -211,12 +214,16 @@ var FileManager = (function(ind){
                         // save indd
                         __ensureDir(Folder.temp + '/indd');
                         var inddName = rtfFile.name.replace(".rtf", ".indd");
-                        _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));                       
+												$.writeln('before SaveINDD: ' + Date.now());
+                        _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));
+												$.writeln('after SaveINDD: ' + Date.now());                       
 
                         // in this case file must exists
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
+														$.writeln('before SaveRTF: ' + Date.now());
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
+														$.writeln('before SaveRTF: ' + Date.now());
                             ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
@@ -224,12 +231,16 @@ var FileManager = (function(ind){
                         }
                     } else {
                         // just export
+												$.writeln('before SaveRTF: ' + Date.now());
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
+												$.writeln('after SaveRTF: ' + Date.now());
                         ret = { file: rtfFile, meta: data.meta };
                     }                   
 
                     // close file
+										$.writeln('before doClose: ' + Date.now());
                     if (doClose) _indesign.activeDocument.close(SaveOptions.no);
+										$.writeln('after doClose: ' + Date.now());
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
