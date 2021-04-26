@@ -2,6 +2,21 @@
 #targetengine "MB_BridgeRTF"
 
 (function (br) {
+    if (!String.prototype.endsWith) {
+      String.prototype.endsWith = function(search, this_len) {
+        if (this_len === undefined || this_len > this.length) {
+          this_len = this.length;
+        }
+        return this.substring(this_len - search.length, this_len) === search;
+      };
+    }
+
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function(search, rawPos) {
+                var pos = rawPos > 0 ? rawPos|0 : 0;
+                return this.substring(pos, pos + search.length) === search;
+        };
+    }
 
     main();
 
@@ -70,7 +85,8 @@
                 var curFound = allFounds[i];
                 curFound.select();
                 app.layoutWindows[0].zoomPercentage = 120;
-                if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                //if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                if (PROG_Confirm("Find/Replace", "Vuoi sostituire?")) {
                     curFound.changeGrep();
                 }
             }
@@ -97,7 +113,8 @@
                 var curFound = allFounds[i];
                 curFound.select();
                 app.layoutWindows[0].zoomPercentage = 120;
-                if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                //if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                if (PROG_Confirm("Find/Replace", "Vuoi sostituire?")) {
                     curFound.changeGrep();
                 }
             }
@@ -108,9 +125,17 @@
                 app.findGrepPreferences.pointSize = 8;
             }
             app.findChangeTextOptions.wholeWord = true;
-            text = text.replace("(", "\\(");
-            text = text.replace(")", "\\)");
-            app.findGrepPreferences.findWhat = "\\b" + text + "\\b";
+            var textToReplace = text;
+            textToReplace =textToReplace.replace("(", "\\(");
+            textToReplace = textToReplace.replace(")", "\\)");
+            if (! textToReplace.startsWith("\\(")) {
+                    textToReplace = "\\b" + textToReplace ;
+               }
+            if (! textToReplace.endsWith("\\)")) {
+                    textToReplace = textToReplace + "\\b";
+               }
+           
+            app.findGrepPreferences.findWhat = textToReplace;
             //app.changeTextPreferences.changeTo = "{ix}<?xw-a  id=\""+nrecord+"_p\" a=\""+nrecord+"\"?>{#ix}"+text+"{ix}<?xw-a  off?>{#ix}";
             if (tags.keep_note) {
                 textTag = "{ix}<?xw-a  id=\"" + nrecord + "_p\" a=\"" + nrecord + "\"?>{#ix}" + text + "{ix}<?xw-a  off?>{#ix} (" + numnote + ")";
@@ -125,7 +150,8 @@
                 var curFound = allFounds[i];
                 curFound.select();
                 app.layoutWindows[0].zoomPercentage = 120;
-                if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                //if (confirm("Vuoi sostituire?", undefined, "Find/Replace")) {
+                if (PROG_Confirm("Find/Replace", "Vuoi sostituire?")) {
                     curFound.changeGrep();
                 }
             }
@@ -403,6 +429,7 @@
             */
         }
     }
+
     function changeNoteReferencesCharacterStyle(myStory, numnote) {
         if (numnote) {
             app.findGrepPreferences = NothingEnum.nothing;
@@ -418,4 +445,31 @@
             }
         }
     }
+    
+    function PROG_Confirm(title, testo) {
+        var G_continua = false;
+        var x_1 = 600;
+        var y_1 = 400;
+        var larg = 300;
+        var alt = 100;
+        var finestra = new Window('dialog', title);
+        finestra.bounds = [x_1, y_1, x_1 + larg, y_1 + alt];
+        with(finestra) {
+            finestra.t1 = add("statictext", [10, 10, 290, 30], testo);
+            //finestra.t2 = add("edittext",[10,40,590,410],elenco, {multiline:true, scrolling:true});
+            finestra.Puls_Manuale = add("button", [10, 50, 150, 75], "Ok");
+            finestra.Puls_Manuale.onClick = function(e) {
+                G_continua = true;
+                finestra.close();
+            };
+            finestra.Puls_PIM = add("button", [170, 50, 290, 75], "Annulla");
+            finestra.Puls_PIM.onClick = function(e) {
+                G_continua = false;
+                finestra.close();
+            };
+        }
+        finestra.show();
+        return G_continua;
+    }
+
 })(CsBridge);
