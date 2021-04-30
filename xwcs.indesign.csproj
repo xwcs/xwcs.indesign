@@ -188,6 +188,9 @@
     <Content Include="assets\js\xwcs.indesign\bridge\json2_src.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\js\xwcs.indesign\menu\GetOpereFromNrecord.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\js\xwcs.indesign\menu\SaveAbstract.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -205,8 +208,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <COMReference Include="InDesign">
       <Guid>{C12DDD4E-6CDC-4C7B-AE0E-A98E01E0FA59}</Guid>
       <VersionMajor>1</VersionMajor>

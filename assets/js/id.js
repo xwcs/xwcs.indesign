@@ -32,15 +32,17 @@
         "BackOffice",
         // features
         [
-            { caption: "Prepara RTF per tag", fileName: "xwcs.indesign/menu/TagDoc.js", subName: "" },
-            { caption: "Salva abstract", fileName: "xwcs.indesign/menu/SaveAbstract.js", subName: "" },
-            { separator: true, subName: "" },
-            { caption: "Incolla RTF", fileName: "xwcs.indesign/menu/SaveRTF.js", subName: "" },
+            //{ caption: "Incolla RTF", fileName: "xwcs.indesign/menu/SaveRTF.js", subName: "" },
             { caption: "Incolla RTF PRINCIPALE", fileName: "xwcs.indesign/menu/SaveMainRTF.js", subName: "" },
             { separator: true, subName: "" },
-            { caption: "Trova destinazione della selezione", fileName: "lib.indesign/LoadDataFromDb.js", subName: "" },
+            { caption: "Opere per NRECORD", fileName: "xwcs.indesign/menu/GetOpereFromNrecord.js", subName: "" },
+            //{ separator: true, subName: "" },
+            //{ caption: "Trova destinazione della selezione", fileName: "lib.indesign/LoadDataFromDb.js", subName: "" },
             { separator: true, subName: "" },
             { caption: "Prova", fileName: "xwcs.indesign/menu/Action.js", subName: "" },
+            { separator: true, subName: "" },
+            { caption: "Prepara RTF per tag", fileName: "xwcs.indesign/menu/TagDoc.js", subName: "" },
+            { caption: "Salva abstract", fileName: "xwcs.indesign/menu/SaveAbstract.js", subName: "" },
             { separator: true, subName: "" },
             { caption: "Info", fileName: "xwcs.indesign/menu/About.js", subName: "" }		
         ],

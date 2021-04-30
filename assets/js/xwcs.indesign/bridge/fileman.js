@@ -22,7 +22,21 @@ var FileManager = (function(ind){
     var _errMsg = '';
     var _myStory;
     var _myLabel;
-    var  _prefsBackup;
+    //var  _prefsBackup;
+	var	_convertPageBreaks,
+		_convertTablesTo,
+		_importEndnotes,
+		_importFootnotes,
+		_importIndex,
+		_importTOC,
+		_importUnusedStyles,
+		_preserveGraphics,
+		_preserveLocalOverrides,
+		_preserveTrackChanges,
+		_removeFormatting,
+		_resolveParagraphStyleClash,
+		_resolveCharacterStyleClash,
+		_useTypographersQuotes;
     var _indtPath = __getScriptPath() + '/tmpl/'+ TEMPLATE_FILE_NAME;
 
     var ret = {
@@ -40,6 +54,14 @@ var FileManager = (function(ind){
             
             // Ask user to open the RTF
             _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
+			// Non capisco perché Giulivi abbia invece gestito la cosa nel modo che segue: se non riesce ad assegnare vero assegna falso, altrimenti vero. Boh!
+			/*
+			if(app.wordRTFImportPreferences.useTypographersQuotes = true){ 
+				app.wordRTFImportPreferences.useTypographersQuotes = false;
+			} else { 
+				app.wordRTFImportPreferences.useTypographersQuotes = true;
+			} 
+			*/
             
             var rtfFile = null;
 
@@ -60,11 +82,47 @@ var FileManager = (function(ind){
                     if (_myStory){
 		
                         //$.writeln(rtfFile.fsName);
-			
+
                         __setAppPreferences();
-			
-                        // place the RTF
-                        _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
+						
+						// Import to a temporary doc to avoid styles garbage
+						// BEGIN
+						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+						var docTemp = _indesign.documents.add();
+						_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+						var boxTemp = docTemp.textFrames.add();
+						boxTemp.geometricBounds = [0,0,1000,1000];
+						var storyTemp =  boxTemp.parentStory;
+						storyTemp.insertionPoints.item(0).place(rtfFile.fsName,false);
+						_indesign.selection = null;
+						for (var i = 0; i < storyTemp.texts.length; i++){
+							if (i > 0){
+								storyTemp.texts[i].select(SelectionOptions.ADD_TO);
+							} else {
+								storyTemp.texts[i].select();
+							}
+						}
+						//$.writeln("storyTemp.contents: " + storyTemp.contents.slice(0, 40));
+						//$.writeln("typeof docTemp: " + typeof docTemp);
+						if (storyTemp.contents) {
+							//$.writeln("DENTRO if (storyTemp.contents)");
+							_indesign.copy();
+							//$.writeln("AFTER _indesign.copy()");
+							docTemp.close(SaveOptions.no);
+							docTemp = undefined;
+							_myStory.insertionPoints.item(0).select();
+							//$.writeln("BEFORE _myStory.contents: " + _myStory.contents.slice(0, 40));
+							_indesign.paste();
+							//$.writeln("AFTER _myStory.contents: " + _myStory.contents.slice(0, 40));
+						}
+						if (docTemp){
+							//$.writeln("typeof docTemp: " + typeof docTemp);
+							docTemp.close(SaveOptions.no);
+						}
+						// END
+						
+                        // The RTF is already placed
+                        // _myStory.insertionPoints.item(0).place(rtfFile.fsName,false);
 			
                         // save the RTF path into story label
                         var lData = {
@@ -72,7 +130,9 @@ var FileManager = (function(ind){
                             meta : typeof(data) == "string" ? JSON.parse(data) : data
                         }
                         data.RtfFilePath = rtfFile.fsName;
-                        _myStory.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
+                        _myStory.label = JSON.stringify(lData);
+						//$.writeln("_myStory.label" + _myStory.label);
+						//iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //_indesign.activeDocument.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //__restoreAppPreferences();
                         
@@ -126,7 +186,22 @@ var FileManager = (function(ind){
                 
                 __initSave();
                 if (_myStory) {
-
+			//$.writeln("save: _myStory.label" + _myStory.label);
+			// Apply default replaces to standardize document
+			$.writeln('Before __pulisciRTF: ' + Date.now());
+			__pulisciRTF(_indesign.activeDocument);
+			$.writeln('After __pulisciRTF: ' + Date.now());
+			// Elimina la riga vuota inserita da ID dopo tutte le tabelle
+			$.writeln('before __EliminaRigaVuotaDopoTabella: ' + Date.now());
+			__EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
+			$.writeln('after __EliminaRigaVuotaDopoTabella: ' + Date.now());
+			//Controlla gli eventuali glifi inesistenti nei font del documento
+			//_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+			$.writeln('before __FindMissingGlyph: ' + Date.now());
+			if (__FindMissingGlyph(_indesign.activeDocument)) {
+				throw new Error(-43, 'Sono presenti glifi senza font. Impossibile continuare.');
+			}
+			$.writeln('after __FindMissingGlyph: ' + Date.now());		
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
                     var data = JSON.parse(_myLabel);
@@ -139,12 +214,16 @@ var FileManager = (function(ind){
                         // save indd
                         __ensureDir(Folder.temp + '/indd');
                         var inddName = rtfFile.name.replace(".rtf", ".indd");
-                        _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));                       
+												$.writeln('before SaveINDD: ' + Date.now());
+                        _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));
+												$.writeln('after SaveINDD: ' + Date.now());                       
 
                         // in this case file must exists
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
+														$.writeln('before SaveRTF: ' + Date.now());
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
+														$.writeln('after SaveRTF: ' + Date.now());
                             ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
@@ -152,12 +231,16 @@ var FileManager = (function(ind){
                         }
                     } else {
                         // just export
+												$.writeln('before SaveRTF: ' + Date.now());
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
+												$.writeln('after SaveRTF: ' + Date.now());
                         ret = { file: rtfFile, meta: data.meta };
                     }                   
 
                     // close file
+										$.writeln('before doClose: ' + Date.now());
                     if (doClose) _indesign.activeDocument.close(SaveOptions.no);
+										$.writeln('after doClose: ' + Date.now());
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
@@ -208,6 +291,7 @@ var FileManager = (function(ind){
             }
         }
     }
+
     function __initSave() {
         var myDocument;
         var myPage;
@@ -249,8 +333,23 @@ var FileManager = (function(ind){
 
     function __setAppPreferences(){
         // save current settings
-        _prefsBackup = _indesign.wordRTFImportPreferences.properties;
-
+		// in the ID enviroment, object properties are placeholders that are evaluated only when instantiated, so I prefer to save very single property needed
+        //_prefsBackup = _indesign.wordRTFImportPreferences.properties;
+		_convertPageBreaks = _indesign.wordRTFImportPreferences.convertPageBreaks;
+		_convertTablesTo = _indesign.wordRTFImportPreferences.convertTablesTo;
+		_importEndnotes = _indesign.wordRTFImportPreferences.importEndnotes;
+		_importFootnotes = _indesign.wordRTFImportPreferences.importFootnotes;
+		_importIndex = _indesign.wordRTFImportPreferences.importIndex;
+		_importTOC = _indesign.wordRTFImportPreferences.importTOC;
+		_importUnusedStyles = _indesign.wordRTFImportPreferences.importUnusedStyles;
+		_preserveGraphics = _indesign.wordRTFImportPreferences.preserveGraphics;
+		_preserveLocalOverrides = _indesign.wordRTFImportPreferences.preserveLocalOverrides;
+		_preserveTrackChanges = _indesign.wordRTFImportPreferences.preserveTrackChanges;
+		_removeFormatting = _indesign.wordRTFImportPreferences.removeFormatting;
+		_resolveParagraphStyleClash = _indesign.wordRTFImportPreferences.resolveParagraphStyleClash;
+		_resolveCharacterStyleClash = _indesign.wordRTFImportPreferences.resolveCharacterStyleClash;
+		_useTypographersQuotes = _indesign.wordRTFImportPreferences.useTypographersQuotes;
+		
         // set predefined settings for the script
         _indesign.wordRTFImportPreferences.convertPageBreaks = ConvertPageBreaks.NONE;
         _indesign.wordRTFImportPreferences.convertTablesTo = ConvertTablesOptions.UNFORMATTED_TABBED_TEXT;
@@ -263,13 +362,29 @@ var FileManager = (function(ind){
         _indesign.wordRTFImportPreferences.preserveLocalOverrides = true;
         _indesign.wordRTFImportPreferences.preserveTrackChanges = true;
         _indesign.wordRTFImportPreferences.removeFormatting = false;
-        _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
-        _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
+		_indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_USE_EXISTING;
+        _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_USE_EXISTING;
+        // _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
+        // _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
         _indesign.wordRTFImportPreferences.useTypographersQuotes = true;
     }
 
     function __restoreAppPreferences() {
-        _indesign.wordRTFImportPreferences.properties = _prefsBackup;
+        // _indesign.wordRTFImportPreferences.properties = _prefsBackup;
+		_indesign.wordRTFImportPreferences.convertPageBreaks = _convertPageBreaks;
+		_indesign.wordRTFImportPreferences.convertTablesTo = _convertTablesTo;
+		_indesign.wordRTFImportPreferences.importEndnotes = _importEndnotes;
+		_indesign.wordRTFImportPreferences.importFootnotes = _importFootnotes;
+		_indesign.wordRTFImportPreferences.importIndex = _importIndex;
+		_indesign.wordRTFImportPreferences.importTOC = _importTOC;
+		_indesign.wordRTFImportPreferences.importUnusedStyles = _importUnusedStyles;
+		_indesign.wordRTFImportPreferences.preserveGraphics = _preserveGraphics;
+		_indesign.wordRTFImportPreferences.preserveLocalOverrides = _preserveLocalOverrides;
+		_indesign.wordRTFImportPreferences.preserveTrackChanges = _preserveTrackChanges;
+		_indesign.wordRTFImportPreferences.removeFormatting = _removeFormatting;
+		_indesign.wordRTFImportPreferences.resolveParagraphStyleClash = _resolveParagraphStyleClash;
+		_indesign.wordRTFImportPreferences.resolveCharacterStyleClash = _resolveCharacterStyleClash;
+		_indesign.wordRTFImportPreferences.useTypographersQuotes = _useTypographersQuotes;
     }
 
     function __getScriptPath() {
@@ -282,6 +397,227 @@ var FileManager = (function(ind){
         if(a.length > 0) a.pop();
         return (a.join ("/") + "/");
     }
+	
+
+	function __pulisciRTF (myDocument) {
+		// Parametri: __cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 )
+		
+		// Create default styles if missing
+		__verifyStyle(myDocument, "TITOLO_SOMMARIO");
+		__verifyStyle(myDocument, "TESTO")
+		
+		//Imposto parametri di change
+		__initReplace();
+		
+		// ex cambiagrep
+		__cambia(myDocument, "  +", " ", true, false, false, false, false, false);
+		__cambia(myDocument, "A’|A'", "À", true, false, false, false, false, false);
+		__cambia(myDocument, "E’|E'", "È", true, false, false, false, false, false);
+		__cambia(myDocument, "I’|I'", "Ì", true, false, false, false, false, false);
+		__cambia(myDocument, "O’|O'", "Ò", true, false, false, false, false, false);
+		__cambia(myDocument, "U’|U'", "Ù", true, false, false, false, false, false);
+		__cambia(myDocument, "a’|a'", "à", true, false, false, false, false, false);
+		__cambia(myDocument, "e’|e'", "è", true, false, false, false, false, false);
+		__cambia(myDocument, "i’|i'", "ì", true, false, false, false, false, false);
+		__cambia(myDocument, "o’|o'", "ò", true, false, false, false, false, false);
+		__cambia(myDocument, "u’|u'", "ù", true, false, false, false, false, false);
+		__cambia(myDocument, " $", "");
+		
+		//ex cambia
+		__cambia(myDocument, "( ", "(", false, false, false, false, false, false);
+		__cambia(myDocument, " )", ")", false, false, false, false, false, false);
+		__cambia(myDocument, " :", ":", false, false, false, false, false, false);
+		__cambia(myDocument, " ,", ",", false, false, false, false, false, false);
+		__cambia(myDocument, " ;", ";", false, false, false, false, false, false);
+		__cambia(myDocument, "«", "“", false, false, false, false, false, false);
+		__cambia(myDocument, "»", "”", false, false, false, false, false, false);
+		__cambia(myDocument, "–", "-", false, false, false, false, false, false);
+		__cambia(myDocument, "“", "\"", false, false, false, false, false, false);
+		__cambia(myDocument, "”", "\"", false, false, false, false, false, false);
+		__cambia(myDocument, "…", "...", false, false, false, false, false, false);
+		__cambia(myDocument, "^k", "", false, false, false, false, false, false);
+		
+		//ex cambiagrep2 (in realtà il nome non era giusto non eseguiva un changeGrep, ma un changeText)
+		__cambia(myDocument, "pò","po'", false, true, false, false, false, false);
+
+		
+		// ex cambia_bold (ripetere la riga per ciascuno stile da sostituire)
+		__cambia(myDocument, "(", "(", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "(", "(", false, false, "Bold Italic", "Italic", false, false);
+		
+		__cambia(myDocument, ")", ")", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ")", ")", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ".", ".", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ".", ".", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ":", ":", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ":", ":", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ";", ";", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ";", ";", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, ",", ",", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, ",", ",", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "“", "“", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "“", "“", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "”", "”", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "”", "”", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "\"", "\"", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "\"", "\"", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "•", "•", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "•", "•", false, false, "Bold Italic", "Italic", false, false);
+
+		__cambia(myDocument, "-", "-", false, false, "Bold", "Regular", false, false);
+		__cambia(myDocument, "-", "-", false, false, "Bold Italic", "Italic", false, false);
+		
+		// Change pagragraph style
+		__cambia(myDocument, "^p^p", "^p^p", false, false, false, false, "TITOLO_SOMMARIO", "TESTO");
+		
+		//Reset of replace parameters
+		__resetReplace();
+	}
+
+	function __initReplace () {
+		//changeText options
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		_indesign.changeTextPreferences = NothingEnum.nothing;
+		_indesign.findChangeTextOptions.caseSensitive = false;
+		_indesign.findChangeTextOptions.includeFootnotes = true;
+		_indesign.findChangeTextOptions.includeHiddenLayers = false;
+		_indesign.findChangeTextOptions.includeLockedLayersForFind = false;
+		_indesign.findChangeTextOptions.includeLockedStoriesForFind = false;
+		_indesign.findChangeTextOptions.includeMasterPages = false;
+		_indesign.findChangeTextOptions.wholeWord = false;
+		
+		// changeGrep options
+		_indesign.findGrepPreferences = NothingEnum.nothing;
+		_indesign.changeGrepPreferences = NothingEnum.nothing;
+		_indesign.findChangeGrepOptions.includeFootnotes = true;
+		_indesign.findChangeGrepOptions.includeHiddenLayers = false;
+		_indesign.findChangeGrepOptions.includeLockedLayersForFind = false;
+		_indesign.findChangeGrepOptions.includeLockedStoriesForFind = false;
+		_indesign.findChangeGrepOptions.includeMasterPages = false;
+	}
+
+	function __resetReplace () {
+		//changeText options
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		_indesign.changeTextPreferences = NothingEnum.nothing;
+		
+		// changeGrep options
+		_indesign.findGrepPreferences = NothingEnum.nothing;
+		_indesign.changeGrepPreferences = NothingEnum.nothing;
+	}
+	
+	function __cambia(myDocument, stringa1, stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 ) {
+		//https://indesignsecrets.com/resources/grep
+		//https://indesignsecrets.com/favorite-grep-expressions-you-can-use.php
+		//https://indesignsecrets.com/grep-and-text-metacharacter-cheat-sheet.php
+		//https://indesignsecrets.com/removing-the-paragraph-return-at-the-end-of-story.php
+		//https://indesignsecrets.com/findbetween-a-useful-grep-string.php
+		
+		__initReplace();
+		if (grep) {
+			_indesign.findGrepPreferences.findWhat = stringa1;
+			_indesign.changeGrepPreferences.changeTo = stringa2;
+			// Do replace
+			myDocument.changeGrep();
+		} else {
+			_indesign.findTextPreferences.findWhat = stringa1;
+			_indesign.changeTextPreferences.changeTo = stringa2;
+			if (wholeword) {
+				_indesign.findChangeTextOptions.wholeWord = true;
+			}
+			if (fontstyle1 && fontstyle2) {
+				_indesign.findTextPreferences.fontStyle = fontstyle1;
+				_indesign.changeTextPreferences.fontStyle = fontstyle2;
+			}
+			if (parastyle1 && parastyle2) {
+				_indesign.findTextPreferences. appliedParagraphStyle = parastyle1;
+				_indesign.changeTextPreferences.appliedParagraphStyle = parastyle2;
+			}
+			// Do replace
+			myDocument.changeText();
+		}
+		_indesign.findTextPreferences = NothingEnum.nothing;
+		__resetReplace();
+	}
+
+
+	function __verifyStyle(myDocument, mystyle){
+	var style, myName;
+	try{
+			style = myDocument.paragraphStyles.item(mystyle);
+			//If the paragraph style does not exist, trying to get its name will generate an error.
+			myName = style.name;
+		}
+		catch (myError){
+			//The paragraph style did not exist, so create it.
+			style = myDocument.paragraphStyles.add({name:mystyle});
+		}
+	}
+	
+	function __EliminaRigaVuotaDopoTabella(myDocument, myStory) {
+		//__cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 ) {
+		//Pulisco le righe costituite solo da spaziature
+		__cambia(myDocument, "^[ |\\t]+$", "", true, false, false, false, false, false);
+		for (var j = 0; j < myStory.paragraphs.length; j++) {
+			var currPara = myStory.paragraphs[j];
+			if (currPara == null || currPara == undefined ) {
+				// continue;
+			} else {
+				if (currPara.tables.length>0) {
+					var k = j;
+					k++;
+					//alert (myStory.paragraphs[j].contents + " " + myStory.paragraphs[k].contents);
+					if (myStory.paragraphs[k].isValid && myStory.paragraphs.length >= k && (myStory.paragraphs[k].contents == "\r" || myStory.paragraphs[k].contents == "\n" || myStory.paragraphs[k].contents == "")) {
+						myStory.paragraphs[k].remove();
+					j--;
+					}
+				}
+			}
+		}
+
+		//Tolgo gli spazi vuoti alla fine della story
+		//non toglie i tag figure (voci d'indice xe identificati come ~I) che ID include nel \s
+		__cambia(myDocument, "[\\s^~I]+\\Z", "\\r", true, false, false, false, false, false);
+	}
+
+
+	function __FindMissingGlyph(myDocument){
+		var missing = false
+		var founded = [];
+		var numFonts = myDocument.fonts.length;
+		for (var z=0;z<numFonts;z++) {
+			var fontS = myDocument.fonts[z]
+			var fontName = fontS.fontFamily + "\t" + fontS.fontStyleName
+			founded = [];
+			_indesign.findGlyphPreferences = NothingEnum.nothing;
+			_indesign.findGlyphPreferences = NothingEnum.nothing;
+			_indesign.findGlyphPreferences.glyphID  = 0;
+			_indesign.findGlyphPreferences.appliedFont = fontName;
+			founded = _indesign.findGlyph ();
+			if (founded.length>0) {
+				//$.writeln(founded.length+ ' Trovati glyphi mancanti in  ' + fontName );
+				missing = true
+				for (var y=0;y<founded.length;y++) {
+					//$.writeln( founded[y].contents+ '   ' +founded[y].contents.charCodeAt(0) );
+					founded[y].select();
+					_indesign.layoutWindows[0].zoomPercentage = 120;
+					if (confirm("Trovati glifi mancanti per font:\r\n" + fontName + "\r\n\r\nVuoi sostituire?", undefined, "Glifi mancanti")) {
+						exit();
+					}
+				}
+			}
+		}
+		return missing
+	}
+		
 
     var _logger = null;
     var __log = function(msg) {
