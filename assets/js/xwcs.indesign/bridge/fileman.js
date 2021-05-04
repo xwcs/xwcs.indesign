@@ -11,6 +11,9 @@
 /* 
     File Manger
 */
+
+//$.level = 1; //debugger
+
 var FileManager = (function(ind){
 
     const TEMPLATE_FILE_NAME = 'template.indt';
@@ -95,7 +98,9 @@ var FileManager = (function(ind){
                         var storyTemp =  boxTemp.parentStory;
                         storyTemp.insertionPoints.item(0).place(rtfFile.fsName,false);
                         _indesign.selection = null;
+						//$.writeln("storyTemp.texts.length:" + storyTemp.texts.length);
                         for (var i = 0; i < storyTemp.texts.length; i++){
+						  //$.writeln("storyTemp.texts[" + i + "]:");
                           if (i > 0){
                             storyTemp.texts[i].select(SelectionOptions.ADD_TO);
                           } else {
@@ -104,16 +109,16 @@ var FileManager = (function(ind){
                         }
                         //$.writeln("storyTemp.contents: " + storyTemp.contents.slice(0, 40));
                         //$.writeln("typeof docTemp: " + typeof docTemp);
-                        if (storyTemp.isValid) {
+                        if (app.selection[0].length > 0 && storyTemp.isValid) {
                           //$.writeln("DENTRO if (storyTemp.isValid)");
                           _indesign.copy();
                           //$.writeln("AFTER _indesign.copy()");
                           docTemp.close(SaveOptions.no);
                           docTemp = undefined;
                           _myStory.insertionPoints.item(0).select();
-                          //$.writeln("BEFORE _myStory.contents: " + _myStory.contents.slice(0, 40));
+                          //$.writeln("BEFORE _indesign.paste()" + _myStory.contents.slice(0, 40));
                           _indesign.paste();
-                          //$.writeln("AFTER _myStory.contents: " + _myStory.contents.slice(0, 40));
+                          //$.writeln("AFTER _indesign.paste()" + _myStory.contents.slice(0, 40));
                         }
                         if (docTemp){
                           //$.writeln("typeof docTemp: " + typeof docTemp);
@@ -170,12 +175,13 @@ var FileManager = (function(ind){
 
         */
         save: function (file, doClose) {
-             _errMsg = '';
-             _err = 0;
-             var ret = null;
+            $.hiresTimer;
+            _errMsg = '';
+            _err = 0;
+            var ret = null;
             
-             var rtfFile = file || null;
-             doClose = doClose != undefined ? doClose : false;
+            var rtfFile = file || null;
+            doClose = doClose != undefined ? doClose : false;
 
 
             _indesign.activeDocument.stories.everyItem().leading = Leading.AUTO;
@@ -188,20 +194,20 @@ var FileManager = (function(ind){
                 if (_myStory) {
                     //$.writeln("save: _myStory.label" + _myStory.label);
                     // Apply default replaces to standardize document
-                    $.writeln('Before __pulisciRTF: ' + Date.now());
+                    $.writeln('Before __pulisciRTF: ' + $.hiresTimer/1000000);
                     __pulisciRTF(_indesign.activeDocument);
-                    $.writeln('After __pulisciRTF: ' + Date.now());
+                    $.writeln('After __pulisciRTF: ' + $.hiresTimer/1000000);
                     // Elimina la riga vuota inserita da ID dopo tutte le tabelle
-                    $.writeln('before __EliminaRigaVuotaDopoTabella: ' + Date.now());
+                    $.writeln('before __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer/1000000);
                     __EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
-                    $.writeln('after __EliminaRigaVuotaDopoTabella: ' + Date.now());
+                    $.writeln('after __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer/1000000);
                     //Controlla gli eventuali glifi inesistenti nei font del documento
                     //_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
-                    $.writeln('before __FindMissingGlyph: ' + Date.now());
+                    $.writeln('before __FindMissingGlyph: ' + $.hiresTimer/1000000);
                     if (__FindMissingGlyph(_indesign.activeDocument)) {
                       throw new Error(-43, 'Sono presenti glifi senza font. Impossibile continuare.');
                     }
-                    $.writeln('after __FindMissingGlyph: ' + Date.now());    
+                    $.writeln('after __FindMissingGlyph: ' + $.hiresTimer/1000000);
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
                     var data = JSON.parse(_myLabel);
@@ -214,16 +220,16 @@ var FileManager = (function(ind){
                         // save indd
                         __ensureDir(Folder.temp + '/indd');
                         var inddName = rtfFile.name.replace(".rtf", ".indd");
-                        $.writeln('before SaveINDD: ' + Date.now());
+                        $.writeln('before SaveINDD: ' + $.hiresTimer/1000000);
                         _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));
-                        $.writeln('after SaveINDD: ' + Date.now());                       
+                        $.writeln('after SaveINDD: ' + $.hiresTimer/1000000);
 
                         // in this case file must exists
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
-                            $.writeln('before SaveRTF: ' + Date.now());
+                            $.writeln('before SaveRTF rtfFile == null: ' + $.hiresTimer/1000000);
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
-                            $.writeln('before SaveRTF: ' + Date.now());
+                            $.writeln('after SaveRTF rtfFile == null: ' + $.hiresTimer/1000000);
                             ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
@@ -231,16 +237,16 @@ var FileManager = (function(ind){
                         }
                     } else {
                         // just export
-                        $.writeln('before SaveRTF: ' + Date.now());
+                        $.writeln('before SaveRTF: ' + $.hiresTimer/1000000);
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
-                        $.writeln('after SaveRTF: ' + Date.now());
+                        $.writeln('after SaveRTF: ' + $.hiresTimer/1000000);
                         ret = { file: rtfFile, meta: data.meta };
                     }                   
 
                     // close file
-                    $.writeln('before doClose: ' + Date.now());
+                    $.writeln('before doClose: ' + $.hiresTimer/1000000);
                     if (doClose) _indesign.activeDocument.close(SaveOptions.no);
-                    $.writeln('after doClose: ' + Date.now());
+                    $.writeln('after doClose: ' + $.hiresTimer/1000000);
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
@@ -300,9 +306,11 @@ var FileManager = (function(ind){
         if (myDocument) {
             //loop all stories to check if there is a label
             var __stories = myDocument.stories.length;
+            $.writeln("sto:"+ myDocument.stories.length);
+            var lista_sto = myDocument.stories.everyItem().getElements();
             var __foundLabel=0;
             for (var i = 0; i < __stories;i++) {
-              var __label = myDocument.stories[i].label;
+              var __label = lista_sto[i].label; //myDocument.stories[i].label;
               if ( __label) {
                 var __data = JSON.parse(__label);
                 if (__data.meta.id_iter) {
@@ -550,24 +558,35 @@ var FileManager = (function(ind){
 
 
   function __verifyStyle(myDocument, mystyle){
-  var style, myName;
-  try{
-      style = myDocument.paragraphStyles.item(mystyle);
-      //If the paragraph style does not exist, trying to get its name will generate an error.
+    var style, myName;
+    style = myDocument.paragraphStyles.item(mystyle);
+    if (style.isValid){
       myName = style.name;
-    }
-    catch (myError){
-      //The paragraph style did not exist, so create it.
+    } else {
       style = myDocument.paragraphStyles.add({name:mystyle});
     }
+    /*
+    try{
+        style = myDocument.paragraphStyles.item(mystyle);
+        //If the paragraph style does not exist, trying to get its name will generate an error.
+        myName = style.name;
+      }
+      catch (myError){
+        //The paragraph style did not exist, so create it.
+        style = myDocument.paragraphStyles.add({name:mystyle});
+      }
+      */
   }
   
   function __EliminaRigaVuotaDopoTabella(myDocument, myStory) {
     //__cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 ) {
     //Pulisco le righe costituite solo da spaziature
     __cambia(myDocument, "^[ |\\t]+$", "", true, false, false, false, false, false);
-    for (var j = 0; j < myStory.paragraphs.length; j++) {
-      var currPara = myStory.paragraphs[j];
+    var lista_par = myStory.paragraphs.everyItem().getElements();
+    var max_par = lista_par.length;
+    
+    for (var j = 0; j < max_par; j++) {
+      var currPara = lista_par[j];
       if (currPara == null || currPara == undefined ) {
         // continue;
       } else {
@@ -592,9 +611,11 @@ var FileManager = (function(ind){
   function __FindMissingGlyph(myDocument){
     var missing = false;
     var founded = [];
-    var numFonts = myDocument.fonts.length;
+    var lista_font = myDocument.fonts.everyItem().getElements();
+    var numFonts = lista_font.length;  //myDocument.fonts.length;
+    $.writeln("numFonts:" + numFonts);
     for (var z=0;z<numFonts;z++) {
-      var fontS = myDocument.fonts[z];
+      var fontS = lista_font[z];
       var fontName = fontS.fontFamily + "\t" + fontS.fontStyleName;
       founded = [];
       _indesign.findGlyphPreferences = NothingEnum.nothing;
