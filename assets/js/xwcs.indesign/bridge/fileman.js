@@ -485,7 +485,13 @@ var FileManager = (function(ind){
     
     // Change pagragraph style
     __cambia(myDocument, "^p^p", "^p^p", false, false, false, false, "TITOLO_SOMMARIO", "TESTO");
-    
+
+    // Change styleRifG
+    __cambia(myDocument, ".", false, true, false, false, false, "RifG", "RifG");
+
+    // Change RifT
+    __cambia(myDocument, ".", false, true, false, false, false, "RifT", "RifT");
+
     //Reset of replace parameters
     __resetReplace();
   }
@@ -532,7 +538,13 @@ var FileManager = (function(ind){
     __initReplace();
     if (grep) {
       _indesign.findGrepPreferences.findWhat = stringa1;
-      _indesign.changeGrepPreferences.changeTo = stringa2;
+      if (stringa2) {
+        _indesign.changeGrepPreferences.changeTo = stringa2;
+      }
+      if (parastyle1 && parastyle2) {
+        _indesign.findGrepPreferences.appliedParagraphStyle = parastyle1;
+        _indesign.findGrepPreferences.appliedParagraphStyle = parastyle2;
+      }
       // Do replace
       myDocument.changeGrep();
     } else {
@@ -546,7 +558,7 @@ var FileManager = (function(ind){
         _indesign.changeTextPreferences.fontStyle = fontstyle2;
       }
       if (parastyle1 && parastyle2) {
-        _indesign.findTextPreferences. appliedParagraphStyle = parastyle1;
+        _indesign.findTextPreferences.appliedParagraphStyle = parastyle1;
         _indesign.changeTextPreferences.appliedParagraphStyle = parastyle2;
       }
       // Do replace
