@@ -543,7 +543,7 @@ var FileManager = (function(ind){
       }
       if (parastyle1 && parastyle2) {
         _indesign.findGrepPreferences.appliedParagraphStyle = parastyle1;
-        _indesign.findGrepPreferences.appliedParagraphStyle = parastyle2;
+        _indesign.changeGrepPreferences.appliedParagraphStyle = parastyle2;
       }
       // Do replace
       myDocument.changeGrep();
