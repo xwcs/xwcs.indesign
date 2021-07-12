@@ -491,7 +491,12 @@ var FileManager = (function(ind){
 
     // Change RifT
     __cambia(myDocument, ".", false, true, false, false, false, "RifT", "RifT");
-
+    
+    //Sostituisco i font rimossi (Minion, ecc.)
+    __cambiaFont(myDocument,"Minion Pro","Arial");
+    __cambiaFont(myDocument,"Minion Pro Bold","Arial");
+    __cambiaFont(myDocument,"Calibri","Arial");
+    
     //Reset of replace parameters
     __resetReplace();
   }
@@ -568,6 +573,14 @@ var FileManager = (function(ind){
     __resetReplace();
   }
 
+  function __cambiaFont(myDocument, font1, font2) {
+    __initReplace();
+    _indesign.findGrepPreferences.appliedFont = font1;
+    _indesign.changeGrepPreferences.appliedFont = font2;
+    // Do replace
+    myDocument.changeGrep();
+    __resetReplace();
+  }
 
   function __verifyStyle(myDocument, mystyle){
     var style, myName;
