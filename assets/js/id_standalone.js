@@ -7,7 +7,6 @@
  * of 0ics srls
  *
  ******************************************************************************/
-
 #targetengine "MB_BridgeRTF"
 var arguments = [
     'indesign.log',

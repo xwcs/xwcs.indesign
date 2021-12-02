@@ -1,5 +1,4 @@
-﻿
-#targetengine "MB_BridgeRTF"
+﻿#targetengine "MB_BridgeRTF"
 
 (function (br) {
     if (!String.prototype.endsWith) {
