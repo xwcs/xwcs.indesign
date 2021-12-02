@@ -7,7 +7,7 @@
  * of 0ics srls
  *
  ******************************************************************************/
-#target "indesign-14"
+
 #targetengine "MB_BridgeRTF"
 
 #include "xwcs.indesign/bridge/base64.js"

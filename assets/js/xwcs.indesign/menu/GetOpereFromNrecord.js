@@ -1,4 +1,4 @@
-﻿#target "indesign-14"
+﻿
 #targetengine "MB_BridgeRTF"
 
 (function (br) {
