@@ -12,10 +12,27 @@
 
 (
 function(br){
+    var msg = "";
+    br.doAction({
+        what:'Log', 
+        args:['<<<SaveMainRTF']
+    })
     try{
+        br.doAction({
+            what:'Log', 
+            args:['<<<Before FileManager.save']
+        })
         var result = FileManager.save(null, false); // save and close
         if(result != null){
+            br.doAction({
+                what:'Log', 
+                args:['>>>"After_FileManager.save": {' + JSON.stringify(result.meta) + '}']
+            })
             // call c# action
+            br.doAction({
+                what:'Log', 
+                args:['<<<Before_SaveRTF']
+            })
             var ret = br.doAction({
                 what:'SaveRtf', 
                 args:[
@@ -24,22 +41,43 @@ function(br){
                     JSON.stringify(result.meta)
                 ]
             }) || { success : false, msg: "Unhandled error" };
-
-            
+            br.doAction({
+                what:'Log', 
+                args:['>>>After SaveRTF']
+            })
 
             if(!ret.success){
                 // error file will remain open
-                alert("Operazione FALLITA!  [" + ret.msg + "]");
+                msg = "Operazione FALLITA!  [" + ret.msg + "]"
             } else {
                 // No error
                 FileManager.closeCurrent();
             }
             br.log("C# response: " + JSON.stringify(ret));
+        } else {
+            br.doAction({
+                what:'Log', 
+                args:['>>>Fail FileManager.save']
+            })
         }
-        
-
     }catch(e){
-        alert("Menu Error: " + e);
-    }    
+        br.doAction({
+            what:'Log', 
+            args:['>>>Error FileManager.save']
+        })
+        msg = "Menu Error: " + e;
+    }
+    if (msg != "") {
+        br.doAction({
+            what:'Log', 
+            args:['>>>Fail SaveMainRTF']
+        })
+        alert(msg)
+    } else {
+        br.doAction({
+            what:'Log', 
+            args:['>>>Ok SaveMainRTF']
+        })
 
+    }
 })(CsBridge);
