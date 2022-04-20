@@ -13,25 +13,25 @@
 (
 function(br){
     var msg = "";
-    br.doAction({
+    var log = br.doAction({
         what:'Log', 
         args:['<<<SaveMainRTF']
     })
     try{
-        br.doAction({
+        log = br.doAction({
             what:'Log', 
-            args:['<<<Before FileManager.save']
+            args:['<<<FileManager.save_Before']
         })
         var result = FileManager.save(null, false); // save and close
         if(result != null){
-            br.doAction({
+            log = br.doAction({
                 what:'Log', 
-                args:['>>>"After_FileManager.save": {' + JSON.stringify(result.meta) + '}']
+                args:['>>>{"FileManager.save_After": {"meta" : ' + JSON.stringify(result.meta) + '}}']
             })
             // call c# action
-            br.doAction({
+            log = br.doAction({
                 what:'Log', 
-                args:['<<<Before_SaveRTF']
+                args:['>>>{"SaveRTF_Before": {"meta" : ' + JSON.stringify(result.meta) + '}}']
             })
             var ret = br.doAction({
                 what:'SaveRtf', 
@@ -41,9 +41,9 @@ function(br){
                     JSON.stringify(result.meta)
                 ]
             }) || { success : false, msg: "Unhandled error" };
-            br.doAction({
+            log = br.doAction({
                 what:'Log', 
-                args:['>>>After SaveRTF']
+                args:['>>>SaveRTF_After']
             })
 
             if(!ret.success){
@@ -55,26 +55,26 @@ function(br){
             }
             br.log("C# response: " + JSON.stringify(ret));
         } else {
-            br.doAction({
+            log = br.doAction({
                 what:'Log', 
-                args:['>>>Fail FileManager.save']
+                args:['>>>FileManager.save_Fail']
             })
         }
     }catch(e){
-        br.doAction({
+        log = br.doAction({
             what:'Log', 
-            args:['>>>Error FileManager.save']
+            args:['>>>FileManager.save_Error']
         })
         msg = "Menu Error: " + e;
     }
     if (msg != "") {
-        br.doAction({
+        log = br.doAction({
             what:'Log', 
             args:['>>>Fail SaveMainRTF']
         })
         alert(msg)
     } else {
-        br.doAction({
+        log = br.doAction({
             what:'Log', 
             args:['>>>Ok SaveMainRTF']
         })
