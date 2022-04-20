@@ -175,6 +175,7 @@ var FileManager = (function(ind){
 
         */
         save: function (file, doClose) {
+            _log = [];
             $.hiresTimer;
             _errMsg = '';
             _err = 0;
@@ -194,24 +195,30 @@ var FileManager = (function(ind){
                 if (_myStory) {
                     //$.writeln("save: _myStory.label" + _myStory.label);
                     // Apply default replaces to standardize document
-                    $.writeln('Before __pulisciRTF: ' + $.hiresTimer/1000000);
+                    $.writeln('Before __pulisciRTF: ' + $.hiresTimer / 1000000);
+                    _log.push('Before __pulisciRTF: ' + $.hiresTimer / 1000000);
                     __pulisciRTF(_indesign.activeDocument);
-                    $.writeln('After __pulisciRTF: ' + $.hiresTimer/1000000);
+                    $.writeln('After __pulisciRTF: ' + $.hiresTimer / 1000000);
+                    _log.push('After __pulisciRTF: ' + $.hiresTimer / 1000000);
                     // Elimina la riga vuota inserita da ID dopo tutte le tabelle
-                    $.writeln('before __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer/1000000);
+                    $.writeln('before __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer / 1000000);
+                    _log.push('before __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer / 1000000);
                     __EliminaRigaVuotaDopoTabella(_indesign.activeDocument, _myStory);
-                    $.writeln('after __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer/1000000);
+                    $.writeln('after __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer / 1000000);
+                    _log.push('after __EliminaRigaVuotaDopoTabella: ' + $.hiresTimer / 1000000);
                     //Controlla gli eventuali glifi inesistenti nei font del documento
                     //_indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
-                    $.writeln('before __FindMissingGlyph: ' + $.hiresTimer/1000000);
+                    $.writeln('before __FindMissingGlyph: ' + $.hiresTimer / 1000000);
+                    _log.push('before __FindMissingGlyph: ' + $.hiresTimer / 1000000);
                     if (__FindMissingGlyph(_indesign.activeDocument)) {
                       throw new Error(-43, 'Sono presenti glifi senza font. Impossibile continuare.');
                     }
-                    $.writeln('after __FindMissingGlyph: ' + $.hiresTimer/1000000);
+                    $.writeln('after __FindMissingGlyph: ' + $.hiresTimer / 1000000);
+                    _log.push('after __FindMissingGlyph: ' + $.hiresTimer / 1000000);
                     // iterId|||fileName
                     //var tmp = _myStory.label.split('|||')
                     var data = JSON.parse(_myLabel);
-
+                    data.meta.content_length = _myStory.contents.length;
                     // what we do ? save in existing from story or new one?
                     if (rtfFile == null) {
                         var rtfPath = data.RtfFilePath; //tmp[1];
@@ -220,16 +227,19 @@ var FileManager = (function(ind){
                         // save indd
                         __ensureDir(Folder.temp + '/indd');
                         var inddName = rtfFile.name.replace(".rtf", ".indd");
-                        $.writeln('before SaveINDD: ' + $.hiresTimer/1000000);
+                        $.writeln('before SaveINDD: ' + $.hiresTimer / 1000000);
+                        _log.push('before SaveINDD: ' + $.hiresTimer / 1000000);
                         _indesign.activeDocument.save(new File(Folder.temp + '/indd/' + inddName));
                         $.writeln('after SaveINDD: ' + $.hiresTimer/1000000);
-
+                        _log.push('after SaveINDD: ' + $.hiresTimer / 1000000);
                         // in this case file must exists
                         if (rtfFile.exists) {
                             var p = _indesign.pdfExportPresets.firstItem();
-                            $.writeln('before SaveRTF rtfFile == null: ' + $.hiresTimer/1000000);
+                            $.writeln('before SaveRTF rtfFile == null: ' + $.hiresTimer / 1000000);
+                            _log.push('before SaveRTF rtfFile == null: ' + $.hiresTimer / 1000000);
                             _myStory.exportFile(ExportFormat.RTF, rtfFile, false, p, '', true);
-                            $.writeln('after SaveRTF rtfFile == null: ' + $.hiresTimer/1000000);
+                            $.writeln('after SaveRTF rtfFile == null: ' + $.hiresTimer / 1000000);
+                            _log.push('after SaveRTF rtfFile == null: ' + $.hiresTimer / 1000000);
                             ret = { file: rtfFile, meta: data.meta };
                         } else {
                             _err = -43;
@@ -237,16 +247,20 @@ var FileManager = (function(ind){
                         }
                     } else {
                         // just export
-                        $.writeln('before SaveRTF: ' + $.hiresTimer/1000000);
+                        $.writeln('before SaveRTF: ' + $.hiresTimer / 1000000);
+                        _log.push('before SaveRTF: ' + $.hiresTimer / 1000000);
                         _myStory.exportFile(ExportFormat.RTF, rtfFile);
-                        $.writeln('after SaveRTF: ' + $.hiresTimer/1000000);
+                        $.writeln('after SaveRTF: ' + $.hiresTimer / 1000000);
+                        _log.push('after SaveRTF: ' + $.hiresTimer / 1000000);
                         ret = { file: rtfFile, meta: data.meta };
                     }                   
 
                     // close file
-                    $.writeln('before doClose: ' + $.hiresTimer/1000000);
+                    $.writeln('before doClose: ' + $.hiresTimer / 1000000);
+                    _log.push('before doClose: ' + $.hiresTimer / 1000000);
                     if (doClose) _indesign.activeDocument.close(SaveOptions.no);
-                    $.writeln('after doClose: ' + $.hiresTimer/1000000);
+                    $.writeln('after doClose: ' + $.hiresTimer / 1000000);
+                    _log.push('after doClose: ' + $.hiresTimer / 1000000);
                 }else{
                     _err = -43;
                     _errMsg = 'Non ci sono documenti aperti o il documento attivo non ha frame nella prima pagina.';
@@ -257,7 +271,7 @@ var FileManager = (function(ind){
             }finally{
                 if ( _errMsg  != '') alert('Si è verificato l\'errore n°' + _err + '.\r' + _errMsg, "FileManager.save");
             }
-
+            ret.meta.log = _log;
             return ret;
         },
 
