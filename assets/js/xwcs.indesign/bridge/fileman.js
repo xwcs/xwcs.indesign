@@ -54,20 +54,9 @@ var FileManager = (function(ind){
             var fPath = path || "";
 
             __log("Custom data: " + data);
-            
-            // Ask user to open the RTF
-            _indesign.wordRTFImportPreferences.useTypographersQuotes = false;
-            // Non capisco perché Giulivi abbia invece gestito la cosa nel modo che segue: se non riesce ad assegnare vero assegna falso, altrimenti vero. Boh!
-            /*
-            if(app.wordRTFImportPreferences.useTypographersQuotes = true){ 
-              app.wordRTFImportPreferences.useTypographersQuotes = false;
-            } else { 
-              app.wordRTFImportPreferences.useTypographersQuotes = true;
-            } 
-            */
-            
-            var rtfFile = null;
 
+            var rtfFile = null;
+            // Ask user to open the RTF
             if( !(rtfFile = File(fPath)).exists )
             {
                 rtfFile = File.openDialog('Apri RTF','Rich Text Format:*.*',false); 
@@ -75,6 +64,8 @@ var FileManager = (function(ind){
             
             // block user
             _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+
+            __setAppPreferences();
 
             if(rtfFile){
                 try {
@@ -86,8 +77,6 @@ var FileManager = (function(ind){
     
                         //$.writeln(rtfFile.fsName);
 
-                        __setAppPreferences();
-            
                         // Import to a temporary doc to avoid styles garbage
                         // BEGIN
                         _indesign.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
@@ -139,12 +128,13 @@ var FileManager = (function(ind){
                         //$.writeln("_myStory.label" + _myStory.label);
                         //iterId + '|||' + rtfFile.fsName;  // iter ID and path
                         //_indesign.activeDocument.label = JSON.stringify(lData); //iterId + '|||' + rtfFile.fsName;  // iter ID and path
-                        //__restoreAppPreferences();
+                        //
                         
                     }else{
                         _err = -43;
                         _errMsg = 'Il template \r"'+_indtPath+'"\r non esiste o non ha frame nella prima pagina.';
                     }
+                    __restoreAppPreferences();
                 }catch(e){
                     _err = e.number;
                     _errMsg = e.description;
@@ -184,11 +174,9 @@ var FileManager = (function(ind){
             var rtfFile = file || null;
             doClose = doClose != undefined ? doClose : false;
 
-
             _indesign.activeDocument.stories.everyItem().leading = Leading.AUTO;
             _indesign.activeDocument.stories.everyItem().autoLeading = 100;
-            
-            //#include "Egaf_PulisciRTF.jsx" 
+
             try {
                 
                 __initSave();
@@ -388,7 +376,8 @@ var FileManager = (function(ind){
         _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_USE_EXISTING;
         // _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
         // _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = ResolveStyleClash.RESOLVE_CLASH_AUTO_RENAME;
-        _indesign.wordRTFImportPreferences.useTypographersQuotes = true;
+        _indesign.wordRTFImportPreferences.useTypographersQuotes = false; //Mail Nicola del 07/10/2021, 17:55
+        _indesign.textPreferences.typographersQuotes = false; //Mail Nicola del 07/10/2021, 17:55 
     }
 
     function __restoreAppPreferences() {
@@ -407,6 +396,7 @@ var FileManager = (function(ind){
       _indesign.wordRTFImportPreferences.resolveParagraphStyleClash = _resolveParagraphStyleClash;
       _indesign.wordRTFImportPreferences.resolveCharacterStyleClash = _resolveCharacterStyleClash;
       _indesign.wordRTFImportPreferences.useTypographersQuotes = _useTypographersQuotes;
+      _indesign.textPreferences.typographersQuotes = _useTypographersQuotes; 
     }
 
     function __getScriptPath() {
@@ -423,6 +413,9 @@ var FileManager = (function(ind){
 
   function __pulisciRTF (myDocument) {
     // Parametri: __cambia(myDocument, stringa1,stringa2, grep, wholeword, fontstyle1, fontstyle2, parastyle1, parastyle2 )
+    
+    //Metto false il flag "Usa virgolette tipografiche"
+    myDocument.textPreferences.typographersQuotes = false; //Mail Nicola del 07/10/2021, 17:55
     
     // Create default styles if missing
     __verifyStyle(myDocument, "TITOLO_SOMMARIO");
@@ -458,6 +451,7 @@ var FileManager = (function(ind){
     __cambia(myDocument, "”", "\"", false, false, false, false, false, false);
     __cambia(myDocument, "…", "...", false, false, false, false, false, false);
     __cambia(myDocument, "^k", "", false, false, false, false, false, false);
+    __cambia(myDocument, "^S", " ", false, false, false, false, false, false); //Mail Nicola del 06/06/2022, 09:35
     
     //ex cambiagrep2 (in realtà il nome non era giusto non eseguiva un changeGrep, ma un changeText)
     __cambia(myDocument, "pò","po'", false, true, false, false, false, false);
@@ -511,11 +505,18 @@ var FileManager = (function(ind){
     __cambiaFont(myDocument,"Minion Pro Bold","Arial");
     __cambiaFont(myDocument,"Calibri","Arial");
     
+    //AVVICINAMENTO PAROLE
+    __cambiaAvvicinamento(myDocument);
+
+    //NOTE IN REGULAR (venivano in bold)
+    __cambiaNoteRegular(myDocument);
+
     //Reset of replace parameters
     __resetReplace();
   }
 
   function __initReplace () {
+
     //changeText options
     _indesign.findTextPreferences = NothingEnum.nothing;
     _indesign.changeTextPreferences = NothingEnum.nothing;
@@ -596,7 +597,27 @@ var FileManager = (function(ind){
     __resetReplace();
   }
 
-  function __verifyStyle(myDocument, mystyle){
+  function __cambiaAvvicinamento(myDocument) {
+    __initReplace();
+    _indesign.findGrepPreferences.findWhat = ".*";
+    _indesign.changeGrepPreferences.tracking = 0;
+    // Do replace
+    myDocument.changeGrep();
+    __resetReplace();
+  }
+
+  function __cambiaNoteRegular(myDocument) {
+    __initReplace();
+    //NOTE IN REGULAR (venivano in bold)
+    _indesign.findGrepPreferences.findWhat = "\\(\\d+\\)";
+    _indesign.findGrepPreferences.pointSize = 8;
+    _indesign.changeGrepPreferences.fontStyle ="Regular";
+    // Do replace
+    myDocument.changeGrep();
+    __resetReplace();
+  }
+
+   function __verifyStyle(myDocument, mystyle){
     var style, myName;
     style = myDocument.paragraphStyles.item(mystyle);
     if (style.isValid){
