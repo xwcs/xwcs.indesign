@@ -522,7 +522,7 @@ namespace xwcs.indesign
             }
             catch (Exception ex1)
             {
-                _logger.Debug("SIndesign.ResetApp " + indesignID + " err: {0}", ex1.Message);
+                _logger.Debug(fmt:"SIndesign.ResetApp " + indesignID + " err: {0}", values:ex1.Message);
                 type = null;
             }
 
@@ -543,7 +543,7 @@ namespace xwcs.indesign
                 string scr = new Composer().Compose("id.js");
                 //string scr = new Composer().Compose("id_standalone.js");
 #if DEBUG_TRACE_LOG_ON
-                _logger.Debug("Script: {0}", scr.Substring(0, 512));
+                _logger.Debug(fmt:"Script: {0}", values:scr.Substring(0, 512));
 #endif
                 // here we need also 3 options for to have paths
                 _app.DoScript(

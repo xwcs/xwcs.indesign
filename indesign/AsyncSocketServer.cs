@@ -132,7 +132,7 @@ namespace xwcs.indesign
         private async Task Process(TcpClient tcpClient)
         {
             string clientEndPoint = tcpClient.Client.RemoteEndPoint.ToString();
-            _logger.Debug("Received connection request from {0}", clientEndPoint);
+            _logger.Debug(fmt:"Received connection request from {0}", values:clientEndPoint);
             try
             {
                 NetworkStream networkStream = tcpClient.GetStream();
@@ -185,7 +185,7 @@ namespace xwcs.indesign
                         data = Encoding.ASCII.GetString(bytes, 0, i);
 
 #if DEBUG_TRACE_LOG_ON
-                    _logger.Debug("Received: {0}", data);
+                    _logger.Debug(fmt:"Received: {0}", values:data);
 #endif
 
                         OnMessageEventArgs args = new OnMessageEventArgs(JsonConvert.DeserializeObject<xwcs.indesign.js.json.Message>(System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data))));
@@ -207,7 +207,7 @@ namespace xwcs.indesign
                         await networkStream.WriteAsync(Encoding.ASCII.GetBytes(lstr).Concat(msg).ToArray(), 0, msglen + 10);
                       
 #if DEBUG_TRACE_LOG_ON
-                        _logger.Debug("Sent: [{0}] -> {1}", lstr, data);
+                        _logger.Debug(fmt:"Sent: [{0}] -> {1}", values: new object[] {lstr, data });
 #endif
                     }
                     tcpClient.Close();
