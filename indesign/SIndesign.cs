@@ -443,7 +443,7 @@ namespace xwcs.indesign
 
                 var ret = a.DoScript(
                     string.Format(@"
-                        #target 'indesign';
+                        #target 'indesign-17';
                         #targetengine 'MB_BridgeRTF';
                         {0}", script),
                     global::InDesign.idScriptLanguage.idJavascript,
@@ -506,8 +506,9 @@ namespace xwcs.indesign
 
 
             // recreate
-            String indesignID = "InDesign.Application.CC.2019";
+            String indesignID = "InDesign.Application.2022";
             /**
+             * InDesign.Application.2022
              * InDesign.Application.2020
              * InDesign.Application.CC.2019
              * InDesign.Application.CC.2018
