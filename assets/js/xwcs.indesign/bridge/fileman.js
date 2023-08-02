@@ -429,7 +429,7 @@ var FileManager = (function (ind) {
         __cambia(myDocument, "i’|i'", "ì", true, false, false, false, false, false);
         __cambia(myDocument, "o’|o'", "ò", true, false, false, false, false, false);
         __cambia(myDocument, "u’|u'", "ù", true, false, false, false, false, false);
-        __cambia(myDocument, " $", "", true);
+        __cambia(myDocument, " +($)", "$1", true);
 
         //ex cambia
         __cambia(myDocument, "( ", "(", false, false, false, false, false, false);
