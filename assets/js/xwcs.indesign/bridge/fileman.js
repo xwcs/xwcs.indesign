@@ -603,8 +603,8 @@ var FileManager = (function (ind) {
         __initReplace();
         //NOTE IN REGULAR (venivano in bold)
         _indesign.findGrepPreferences.findWhat = "\\(\\d+\\)";
-        _indesign.findGrepPreferences.pointSize = 8;
-        _indesign.changeGrepPreferences.fontStyle = "Regular";
+        _indesign.findGrepPreferences.pointSize = 8; 
+        _indesign.changeGrepPreferences.pointSize = 8;
         // Do replace
         myDocument.changeGrep();
         __resetReplace();
