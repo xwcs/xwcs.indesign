@@ -166,6 +166,8 @@
             currDoc.indexes.add();
         }
         tagsToCharacterStyles(currDoc, tags);
+        GeneraAncore(currDoc, "{ix}", "{#ix}");
+        /*
         foundedGrep = currDoc.findGrep();
         Le = foundedGrep.length;
         var w = new Window('palette', 'Creating topics');
@@ -175,7 +177,7 @@
             w.pbar.value = Le - i;
             addPageRef(currDoc, foundedGrep[i], tags);
         }
-  
+        */
         // if (tags.keep_tags == false) {
         if (true) {
             delete_tags(currDoc);
@@ -195,6 +197,81 @@
         f.close();
     }
 
+    function GeneraAncore(doc, tag_apri_ancora, tag_chiudi_ancora) {
+        doc.textPreferences.typographersQuotes = false; //Metto false il flag "Usa virgolette tipografiche"
+        //cerco le ancore
+        app.findGrepPreferences = null;
+        app.findChangeGrepOptions.includeFootnotes = true;
+        //in teoira se i tag di apertura o chiusura contengono dei caratteri speciali di regex potrebbe essere un problema, ma non dsovrebbe capitare
+        app.findGrepPreferences.findWhat = tag_apri_ancora + '.+?' + tag_chiudi_ancora;
+        var fgraw = doc.findGrep(true);
+        //$.writeln("Trovati " + fgraw.length + " elementi");
+        //se non trovo niente non faccio niente
+        if (fgraw.length>0) {
+            //creo un frame per crearci dentro le pageerferences (poi lo cancellerò alla fine)
+            //creando un frame vuoto aggiro tutti i problemi di posizionamento del pagereference in casi di presenza di tabelle
+            //che con il metodo move non sembrano esserci mentre ci sono aggiungendo la pagereference direttamente nel posto finale
+            var newFrame = doc.pages[0].textFrames.add();
+            if(doc.indexes.length==0) {
+                    doc.indexes.Add();
+            }
+            Le = fgraw.length;
+            var w_prog = new Window('palette', 'Creating topics');
+            w_prog.pbar = w_prog.add('progressbar', [0, 0, 300, 20], 0, Le);
+            w_prog.show();
+
+            var MARCATORE_ANCORA_XW = "<?xw-a ";
+            var MARCATORE_CHIUDI_ANCORA_XW = "?>";
+            var MARCATORE_FINE_ANCORA_XW = MARCATORE_ANCORA_XW +"off" + MARCATORE_CHIUDI_ANCORA_XW;
+
+            for(indexancora=0;indexancora<fgraw.length;indexancora++) {
+                w_prog.pbar.value = indexancora+1;
+                w_prog.update();
+                var found = fgraw[indexancora];
+                $.writeln("" + fgraw[indexancora].contents);
+                //leggo il contenuto dell'ancora trovata e tolgo i delimitatori di apertura e chiusura
+                var tag = "" + found.contents.substring(tag_apri_ancora.length);
+                tag = tag.substring(0, tag.length - tag_chiudi_ancora.length).replace(/(^ +)|( $)/g, "");
+                //se il testo non contiene già i marcatori di ancora xw li aggiungo io
+                if(tag.indexOf(MARCATORE_ANCORA_XW)!=0)
+                {
+                    tag = MARCATORE_ANCORA_XW + tag;
+                }
+                if (tag.indexOf(MARCATORE_CHIUDI_ANCORA_XW)!=tag.length-MARCATORE_CHIUDI_ANCORA_XW.length)
+                {
+                    tag = tag + MARCATORE_CHIUDI_ANCORA_XW;
+                }
+                //creo la voce d'indice
+                var topic = doc.indexes[0].topics.add(tag);
+                //svuoto il contenuto del frame dove creerò la pagereference (non necessario in teoria), poer poi spostarla nel posto giusto
+                newFrame.texts.firstItem().contents = "";
+                //creo la pagereference nel frame
+                var p_ref = topic.pageReferences.add(newFrame.texts[0].insertionPoints[0], PageReferenceType.CURRENT_PAGE);
+                //per far mantenere all'ancora lo stile di carattere del testo che andrà a circondare gestisco lo spostamento della pagereference
+                //in modo diverso se sono in un'ancora di apertura o chiusura e di conseguenza anche per gestire diversamente l'eliminazione 
+                //del testo precedentemente trovato
+                if (tag == MARCATORE_FINE_ANCORA_XW)
+                {
+                    //l'ancora di chiusura la inserisco prima del testo trovato
+                    var insertionpoint= found.insertionPoints[0];
+                    newFrame.characters.firstItem().move(LocationOptions.BEFORE, insertionpoint);
+                    found.contents="";
+                } else
+                {
+                    //l'ancora di apertura la inserisco dopo il testo trovato
+                    var insertionpoint= found.insertionPoints[-1];
+                    newFrame.characters.firstItem().move(LocationOptions.AFTER, insertionpoint);
+                    //se pulissi tutto il contents direttamente (come faccio con la chiusura) eliminerei anche la pagereference appena creats
+                    found.parentStory.texts.itemByRange(found.insertionPoints[0], found.insertionPoints[-1]).contents="";
+                }
+                $.writeln("" + tag);
+            }
+            //elimino il frame di appoggio
+            newFrame.remove();
+            app.findGrepPreferences = null;
+            w_prog.close();
+        }
+    }
     function read_history() {
         var f = File(scriptName().replace(/\.js.*$/, '.txt'));
         var o = {
